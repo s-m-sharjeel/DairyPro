@@ -1,5 +1,5 @@
 const { getMaxListeners } = require("events");
-const mongoose = require("mongoose");
+const oracledb = require("oracledb");
 
 const adminSchema = new mongoose.Schema(
   {
