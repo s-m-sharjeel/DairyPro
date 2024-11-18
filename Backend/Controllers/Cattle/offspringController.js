@@ -4,7 +4,7 @@
 const {
     newOffspring,
     growOffspringByID
-  } = require("../../models/offspringModel");
+  } = require("../../Models/Cattle/offspringModel");
   const db = require("../../config/db");
 
   /**

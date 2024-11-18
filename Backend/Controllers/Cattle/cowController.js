@@ -4,7 +4,7 @@
 const {
     newCow,
     updateLactationStatusByID
-  } = require("../../models/cattleModel");
+  } = require("../../Models/Cattle/cattleModel");
   const db = require("../../config/db");
   
   /**

@@ -1,18 +1,23 @@
 const express=require("express");
 const cors=require("cors");
-const { connection } = require("./src/connection/db");
-const { farmerRouter } = require("./src/Farmer/farmerRoutes");
-const { AdminRouter } = require("./src/Admin/adminRoutes");
-const { MilkRouter } = require("./src/Milk/milkRoutes");
-const { transporter } = require("./src/connection/mailConnection");
-const rateRouter = require("./src/Milk/RateSetting/rateSettingRoutes");
 
+const authMiddleware = require("./Middlewares/authMiddleware");
+const authRoutes = require("./Routes/authRoutes");
+const cattleRoutes = require("./Routes/cattleRoutes");
+const feedRoutes = require("./Routes/feedRoutes");
+const milkRoutes = require("./Routes/milkRoutes");
+
+const bullRoutes = require("./Routes/Cattle/bullRoutes");
+const cowRoutes = require("./Routes/Cattle/cowRoutes");
+const offspringRoutes = require("./Routes/Cattle/offspringRoutes");
+const breedRoutes = require("./Routes/Records/breedRoutes");
+const vetRoutes = require("./Routes/Records/vetRoutes");
+
+const db = require("./config/db");
 
 require("dotenv").config();
-const PORT=process.env.PORT || 3030;
 
-const app=express();
-
+const app = express();
 
 // CORS configuration
 // app.use(cors({
@@ -23,36 +28,31 @@ const app=express();
 // }));
 
 app.use(cors());
- app.options('*', cors()); 
+app.options('*', cors()); 
 
 app.use(express.json());
-
-app.get("/", async (req, res) => {
-    res.sendFile(__dirname + "/utils/index.html");
-  });
   
 
+// Routes
+app.use("/api", cattleRoutes);
+app.use("/api", feedRoutes);
+app.use("/api", milkRoutes);
 
-app.use("/api/admin",AdminRouter);
-app.use("/api/farmer",farmerRouter);
-app.use("/api/milk",MilkRouter)
-app.use("/api/rate",rateRouter);
+app.use("/api", bullRoutes);
+app.use("/api", cowRoutes);
+app.use("/api", offspringRoutes);
+app.use("/api", breedRoutes);
+app.use("/api", vetRoutes);
 
-//server
-app.listen(PORT, async ()=>{
-    try {
-        await connection
-         
-        console.log("DB connected successfully")
-        console.log(`Server is running on port ${PORT}`)
-        transporter.verify(function (error, success) {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log("Server is ready to take our messages");
-            }
-          });
-    } catch (error) {
-        console.error(error);
-    }
-})
+// Catch-all route to verify that the app is running
+app.use("/", (req, res) => {
+  res.json({ message: "App is running!" });
+});
+
+// Start Server and DB
+const PORT = process.env.PORT || 5000;
+db.initialize().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+});

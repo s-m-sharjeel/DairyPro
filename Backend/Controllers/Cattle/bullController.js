@@ -3,7 +3,7 @@
  */
 const {
     newBull,
-  } = require("../../models/bullModel");
+  } = require("../../Models/Cattle/bullModel");
   const db = require("../../config/db");
 
   /**

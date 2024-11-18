@@ -5,7 +5,7 @@ const {
     listAllCattle,
     updateCattleByID,
     deleteCattleByID,
-  } = require("../models/cattleModel");
+  } = require("../Models/cattleModel");
   const db = require("../config/db");
   
   /**
