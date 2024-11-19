@@ -1,5 +1,4 @@
 const express=require("express");
-const cors=require("cors");
 
 const authMiddleware = require("./Middlewares/authMiddleware");
 const authRoutes = require("./Routes/authRoutes");
@@ -13,11 +12,12 @@ const offspringRoutes = require("./Routes/Cattle/offspringRoutes");
 const breedRoutes = require("./Routes/Records/breedRoutes");
 const vetRoutes = require("./Routes/Records/vetRoutes");
 
-const db = require("./config/db");
-
 require("dotenv").config();
 
+const db = require("./config/db");
 const app = express();
+const bodyParser = require("body-parser");
+const cors = require("cors");
 
 // CORS configuration
 // app.use(cors({
@@ -27,11 +27,15 @@ const app = express();
 //   credentials: true // Allow credentials like cookies
 // }));
 
+// Middleware to enable CORS
 app.use(cors());
 app.options('*', cors()); 
 
+// Middleware to parse JSON bodies
 app.use(express.json());
-  
+
+// Middleware to parse URL-encoded bodies
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api", cattleRoutes);
@@ -43,6 +47,8 @@ app.use("/api", cowRoutes);
 app.use("/api", offspringRoutes);
 app.use("/api", breedRoutes);
 app.use("/api", vetRoutes);
+
+app.use("/api", authRoutes);
 
 // Catch-all route to verify that the app is running
 app.use("/", (req, res) => {

@@ -1,6 +1,7 @@
 CREATE TABLE users (
     email VARCHAR2(255) PRIMARY KEY,
-    password VARCHAR2(255) NOT NULL
+    password VARCHAR2(255) NOT NULL,
+    role VARCHAR2(255) DEFAULT 'farmer' CHECK (role IN ('farmer', 'admin'))
 );
 
 select * from users;
