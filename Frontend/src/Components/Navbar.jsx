@@ -1,6 +1,5 @@
-// Navbar.js
-import React, { useState } from 'react';
-import { Link } from 'react-scroll';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = ({ isLoggedIn, onLoginToggle }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -10,37 +9,43 @@ const Navbar = ({ isLoggedIn, onLoginToggle }) => {
   };
 
   return (
-    <nav className="bg-gray-800 p-4 fixed top-0 w-full z-10">
+    <nav className="bg-blue-800 p-4 fixed top-0 w-full z-10">
       <div className="container mx-auto flex justify-between items-center">
+        {/* Logo and Brand */}
         <div className="flex items-center">
-          <img src="https://meridairy.in/logo.png" alt="Logo" className="h-10 mr-4" />
-          <span className="text-white">Milkify</span>
+          <img
+            src="https://example.com/dairypro-logo.png" // Replace with actual logo URL
+            alt="Dairy Pro Logo"
+            className="h-10 mr-4"
+          />
+          <span className="text-white font-bold text-lg">Dairy Pro</span>
         </div>
+
+        {/* Desktop Links */}
         <div className="hidden md:flex space-x-4">
-          <Link to="home" smooth={true} duration={500} offset={-70} className="text-white">
-            Home
+          <Link to="/dashboard" className="text-white">
+            Dashboard
           </Link>
-          <Link to="features" smooth={true} duration={500} offset={-70} className="text-white">
-            Features
+          <Link to="/milk-production" className="text-white">
+            Milk Production
           </Link>
-          <Link to="about" smooth={true} duration={500} offset={-70} className="text-white">
-            About
+          <Link to="/feed-management" className="text-white">
+            Feed Management
           </Link>
           {isLoggedIn ? (
-            <Link>
             <button className="text-white" onClick={onLoginToggle}>
               Logout
             </button>
-            </Link>
           ) : (
-            <Link to='/admin/signin'>
-            <button className="text-white" onClick={onLoginToggle}>
-              Login
-            </button>
+            <Link to="/signin">
+              <button className="text-white" onClick={onLoginToggle}>
+                Login
+              </button>
             </Link>
           )}
         </div>
-        {/* Mobile Menu Toggle Button */}
+
+        {/* Mobile Menu Toggle */}
         <div className="md:hidden">
           <button
             onClick={handleMobileMenuToggle}
@@ -63,32 +68,29 @@ const Navbar = ({ isLoggedIn, onLoginToggle }) => {
           </button>
         </div>
       </div>
+
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-gray-700 p-4">
-          <Link to="home" smooth={true} duration={500} offset={-70} className="text-white block mb-2">
-            Home
+        <div className="md:hidden bg-blue-700 p-4">
+          <Link to="/dashboard" className="text-white block mb-2">
+            Dashboard
           </Link>
-          <Link
-            to="features"
-            smooth={true}
-            duration={500}
-            offset={-70}
-            className="text-white block mb-2"
-          >
-            Features
+          <Link to="/milk-production" className="text-white block mb-2">
+            Milk Production
           </Link>
-          <Link to="about" smooth={true} duration={500} offset={-70} className="text-white block mb-2">
-            About
+          <Link to="/feed-management" className="text-white block mb-2">
+            Feed Management
           </Link>
           {isLoggedIn ? (
             <button className="text-white block" onClick={onLoginToggle}>
               Logout
             </button>
           ) : (
-            <button className="text-white block" onClick={onLoginToggle}>
-              Login
-            </button>
+            <Link to="/signin">
+              <button className="text-white block" onClick={onLoginToggle}>
+                Login
+              </button>
+            </Link>
           )}
         </div>
       )}
