@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { Button, TextField, FormControl, InputLabel, Select, MenuItem, Grid, Typography } from '@mui/material';
-import { useMutation } from 'react-query';
-import axios from "../../services/api"; // Make sure this is correctly set up
-import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
+import { Button, TextField, FormControl, InputLabel, Select, MenuItem, Grid, Typography, Snackbar, Alert } from '@mui/material';
+import axios from "../../services/api"; // Import axios for making API calls
 
 const AddCattle = () => {
   const [cattleData, setCattleData] = useState({
@@ -14,24 +12,8 @@ const AddCattle = () => {
     feedConsumption: '',
   });
 
-  const navigate = useNavigate(); // Replace useHistory with useNavigate
-
-  // Define the addCattle function here
-  const addCattle = async (cattleData) => {
-    try {
-      const response = await axios.post("/cattle", cattleData); // Make sure the endpoint is correct
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to add cattle");
-    }
-  };
-
-  const { mutate: addNewCattle, isLoading, isError, error } = useMutation(addCattle, {
-    onSuccess: () => {
-      // On success, redirect or show a success message
-      navigate('/cattle'); // Use navigate to redirect to cattle list page
-    },
-  });
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,9 +23,41 @@ const AddCattle = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addNewCattle(cattleData);
+
+    // Validate inputs
+    if (!cattleData.type || !cattleData.breed || !cattleData.age || !cattleData.weight || !cattleData.feed || !cattleData.feedConsumption) {
+      setError("All fields are required");
+      return;
+    }
+
+    try {
+      // API call to add cattle
+      const response = await axios.post('/cattle', {
+        type: cattleData.type,
+        breed: cattleData.breed,
+        age: parseInt(cattleData.age),
+        weight: parseFloat(cattleData.weight),
+        feed: cattleData.feed,
+        feedConsumption: parseFloat(cattleData.feedConsumption),
+      });
+
+      if (response.status === 201) {
+        setSuccess(true);
+        setCattleData({
+          type: '',
+          breed: '',
+          age: '',
+          weight: '',
+          feed: '',
+          feedConsumption: '',
+        });
+        setError('');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    }
   };
 
   return (
@@ -106,7 +120,7 @@ const AddCattle = () => {
                 onChange={handleChange}
                 required
               >
-                {/* Populate feed options dynamically (could come from the backend API) */}
+                {/* Populate feed options dynamically */}
                 <MenuItem value="Feed1">Feed1</MenuItem>
                 <MenuItem value="Feed2">Feed2</MenuItem>
                 <MenuItem value="Feed3">Feed3</MenuItem>
@@ -126,18 +140,32 @@ const AddCattle = () => {
           </Grid>
         </Grid>
 
-        {isError && <Typography color="error">{error.message}</Typography>}
-
         <Button
           type="submit"
           variant="contained"
           color="primary"
-          disabled={isLoading}
+          fullWidth
           sx={{ marginTop: '20px' }}
         >
-          {isLoading ? 'Adding...' : 'Add Cattle'}
+          Add Cattle
         </Button>
       </form>
+
+      {success && (
+        <Snackbar open autoHideDuration={3000} onClose={() => setSuccess(false)}>
+          <Alert severity="success" sx={{ width: '100%' }}>
+            Cattle added successfully!
+          </Alert>
+        </Snackbar>
+      )}
+
+      {error && (
+        <Snackbar open autoHideDuration={3000} onClose={() => setError("")}>
+          <Alert severity="error" sx={{ width: '100%' }}>
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
     </div>
   );
 };

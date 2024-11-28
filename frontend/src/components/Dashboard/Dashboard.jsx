@@ -12,10 +12,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data for the dashboard
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get("/dashboard-data"); // Update endpoint based on your backend API
+        const response = await axios.get("/dashboard-data");
         setDashboardData(response.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -43,7 +42,7 @@ const Dashboard = () => {
   }
 
   return (
-    <Box sx={{ padding: "20px" }}>
+    <Box sx={{ padding: "20px", flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
         Dashboard Overview
       </Typography>

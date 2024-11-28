@@ -1,18 +1,6 @@
 import { useState } from "react";
-import {
-  Flex,
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  Button,
-  Heading,
-  Text,
-  useToast,
-  Select,
-} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"; // Import the custom AuthContext
+import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -22,9 +10,8 @@ const Register = () => {
     role: "",
   });
   const [loading, setLoading] = useState(false);
-  const toast = useToast();
   const navigate = useNavigate();
-  const { register } = useAuth(); // Access register function from AuthContext
+  const { register } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,133 +25,101 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Basic validation for form fields
     if (!formData.name || !formData.email || !formData.password || !formData.role) {
-      toast({
-        title: "Field Error",
-        description: "Please fill in all the fields.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      alert("Please fill in all the fields.");
       setLoading(false);
       return;
     }
 
     try {
-      // Assuming `register` function in context handles API calls and updates context
       const response = await register(formData.name, formData.email, formData.password, formData.role);
       if (response?.token) {
-        toast({
-          title: "Registration Successful",
-          description: "Welcome aboard! You can now log in.",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
+        alert("Registration Successful. You can now log in.");
         navigate("/login"); // Navigate to login page after successful registration
       } else {
-        toast({
-          title: "Registration Failed",
-          description: "Something went wrong. Please try again.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        alert("Registration Failed. Something went wrong.");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again later.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      alert("Error. Something went wrong. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Flex
-      minH={"100vh"}
-      align={"center"}
-      justify={"center"}
-      bg={"gray.50"}
-    >
-      <Box
-        p={8}
-        borderRadius="md"
-        boxShadow="lg"
-        bg="white"
-        width="100%"
-        maxWidth="400px"
-      >
-        <Heading mb={6} textAlign="center">
-          Register
-        </Heading>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: "#f0f0f0" }}>
+      <div style={{ padding: "20px", backgroundColor: "white", borderRadius: "8px", width: "100%", maxWidth: "400px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Register</h2>
         <form onSubmit={handleSubmit}>
-          <FormControl id="name" isRequired mb={4}>
-            <FormLabel>Name</FormLabel>
-            <Input
+          <div style={{ marginBottom: "15px" }}>
+            <label htmlFor="name">Name</label>
+            <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
+              required
+              style={{ width: "100%", padding: "8px", marginTop: "5px", borderRadius: "4px", border: "1px solid #ddd" }}
             />
-          </FormControl>
+          </div>
 
-          <FormControl id="email" isRequired mb={4}>
-            <FormLabel>Email Address</FormLabel>
-            <Input
+          <div style={{ marginBottom: "15px" }}>
+            <label htmlFor="email">Email Address</label>
+            <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
+              required
+              style={{ width: "100%", padding: "8px", marginTop: "5px", borderRadius: "4px", border: "1px solid #ddd" }}
             />
-          </FormControl>
+          </div>
 
-          <FormControl id="password" isRequired mb={4}>
-            <FormLabel>Password</FormLabel>
-            <Input
+          <div style={{ marginBottom: "15px" }}>
+            <label htmlFor="password">Password</label>
+            <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
+              required
+              style={{ width: "100%", padding: "8px", marginTop: "5px", borderRadius: "4px", border: "1px solid #ddd" }}
             />
-          </FormControl>
+          </div>
 
-          <FormControl id="role" isRequired mb={6}>
-            <FormLabel>Role</FormLabel>
-            <Select
+          <div style={{ marginBottom: "25px" }}>
+            <label htmlFor="role">Role</label>
+            <select
               name="role"
               value={formData.role}
               onChange={handleInputChange}
-              placeholder="Select role"
+              required
+              style={{ width: "100%", padding: "8px", marginTop: "5px", borderRadius: "4px", border: "1px solid #ddd" }}
             >
+              <option value="">Select role</option>
               <option value="farmer">Farmer</option>
-              <option value="admin">Administrator</option>
-            </Select>
-          </FormControl>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
-          <Button
-            width="100%"
-            colorScheme="teal"
-            isLoading={loading}
+          <button
             type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: "10px",
+              backgroundColor: "#007bff",
+              color: "white",
+              borderRadius: "4px",
+              border: "none",
+              fontSize: "16px",
+            }}
           >
-            Register
-          </Button>
+            {loading ? "Registering..." : "Register"}
+          </button>
         </form>
-
-        <Text mt={4} textAlign="center">
-          Already have an account?{" "}
-          <Button variant="link" color="teal.500" onClick={() => navigate("/login")}>
-            Login
-          </Button>
-        </Text>
-      </Box>
-    </Flex>
+      </div>
+    </div>
   );
 };
 

@@ -1,8 +1,17 @@
 import React from 'react';
 import { Box, Typography, Grid, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Correct path based on your folder structure
 
 const Home = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();  // Accessing the logout function from the context
+
+  const handleLogout = () => {
+    logout();  // Call logout function
+    navigate('/login');  // Redirect to login page after logout
+  };
+
   return (
     <Box
       sx={{
@@ -16,7 +25,7 @@ const Home = () => {
       }}
     >
       <Typography variant="h3" sx={{ marginBottom: 3 }}>
-        Welcome to the Cow Management System
+        Welcome to DairyPro
       </Typography>
 
       <Typography variant="h5" sx={{ marginBottom: 4 }}>
@@ -27,7 +36,7 @@ const Home = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Button
             component={Link}
-            to="/farmer-dashboard"
+            to="/dashboard"
             variant="contained"
             fullWidth
             sx={{
@@ -85,6 +94,22 @@ const Home = () => {
             }}
           >
             Feed Management
+          </Button>
+        </Grid>
+
+        {/* Logout Button */}
+        <Grid item xs={12} sm={6} md={3}>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              backgroundColor: '#d32f2f',
+              color: 'white',
+              '&:hover': { backgroundColor: '#c62828' },
+            }}
+            onClick={handleLogout} // Trigger logout function
+          >
+            Logout
           </Button>
         </Grid>
       </Grid>

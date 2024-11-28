@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Button, TextField, FormControl, InputLabel, Select, MenuItem, Grid, Typography } from '@mui/material';
-import { useMutation } from 'react-query';
-import axios from "../../services/api"; // Make sure this is correctly set up
-import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
+import { Button, TextField, FormControl, InputLabel, Select, MenuItem, Grid, Typography, Snackbar, Alert } from '@mui/material';
+import axios from "../../services/api"; // Assuming axios is set up for API calls
+import { useNavigate } from 'react-router-dom';
 
 const AddCattle = () => {
   const [cattleData, setCattleData] = useState({
@@ -13,25 +12,11 @@ const AddCattle = () => {
     feed: '',
     feedConsumption: '',
   });
+  
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  const navigate = useNavigate(); // Replace useHistory with useNavigate
-
-  // Define the addCattle function here
-  const addCattle = async (cattleData) => {
-    try {
-      const response = await axios.post("/cattle", cattleData); // Make sure the endpoint is correct
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to add cattle");
-    }
-  };
-
-  const { mutate: addNewCattle, isLoading, isError, error } = useMutation(addCattle, {
-    onSuccess: () => {
-      // On success, redirect or show a success message
-      navigate('/cattle'); // Use navigate to redirect to cattle list page
-    },
-  });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,9 +26,44 @@ const AddCattle = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addNewCattle(cattleData);
+
+    // Validate inputs
+    if (!cattleData.type || !cattleData.breed || !cattleData.age || !cattleData.weight || !cattleData.feed || !cattleData.feedConsumption) {
+      setError("All fields are required");
+      return;
+    }
+
+    try {
+      // API call to add cattle record
+      const response = await axios.post("/cattle", {
+        type: cattleData.type,
+        breed: cattleData.breed,
+        age: parseInt(cattleData.age),
+        weight: parseFloat(cattleData.weight),
+        feed: cattleData.feed,
+        feedConsumption: parseFloat(cattleData.feedConsumption),
+      });
+
+      if (response.status === 201) {
+        setSuccess(true);
+        // Reset form fields
+        setCattleData({
+          type: '',
+          breed: '',
+          age: '',
+          weight: '',
+          feed: '',
+          feedConsumption: '',
+        });
+        setError("");
+        // Redirect to cattle list page
+        navigate('/cattle');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    }
   };
 
   return (
@@ -126,18 +146,32 @@ const AddCattle = () => {
           </Grid>
         </Grid>
 
-        {isError && <Typography color="error">{error.message}</Typography>}
-
         <Button
           type="submit"
           variant="contained"
           color="primary"
-          disabled={isLoading}
           sx={{ marginTop: '20px' }}
         >
-          {isLoading ? 'Adding...' : 'Add Cattle'}
+          Add Cattle
         </Button>
       </form>
+
+      {/* Success and error messages */}
+      {success && (
+        <Snackbar open autoHideDuration={3000} onClose={() => setSuccess(false)}>
+          <Alert severity="success" sx={{ width: "100%" }}>
+            Cattle added successfully!
+          </Alert>
+        </Snackbar>
+      )}
+
+      {error && (
+        <Snackbar open autoHideDuration={3000} onClose={() => setError("")}>
+          <Alert severity="error" sx={{ width: "100%" }}>
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
     </div>
   );
 };
