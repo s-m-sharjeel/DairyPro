@@ -7,7 +7,7 @@ async function newOffspring(offspringData) {
       console.log(offspringData);
       // adding into cattle
       await conn.execute(
-        `INSERT INTO Cattle (cattle_ID, breed, age, weight, feed, feedConsumption) VALUES (:cattle_ID, :breed, :age, :weight, :feed, :feedConsumption)`,
+        "INSERT INTO Cattle (cattle_ID, breed, age, weight, feed, feedConsumption) VALUES (:cattle_ID, :breed, :age, :weight, :feed, :feedConsumption)",
         {
           cattle_ID: offspringData.cattle_id, 
           breed: offspringData.breed, 
@@ -20,7 +20,7 @@ async function newOffspring(offspringData) {
       );
       // adding into offspring
       await conn.execute(
-        `INSERT INTO offspring (offspring_ID, cattle_ID, sex) VALUES (:cattle_ID, :offspring_ID, :sex)`,
+        "INSERT INTO offspring (offspring_ID, cattle_ID, sex) VALUES (:cattle_ID, :offspring_ID, :sex)",
         {
           offspring_ID: offspringData.offspring_ID,
           cattle_ID: offspringData.cattle_ID,
