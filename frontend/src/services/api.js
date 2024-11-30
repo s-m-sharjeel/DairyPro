@@ -7,4 +7,16 @@ const api = axios.create({
   },
 });
 
+
+export const updateUserSettings = async (data) => {
+  try {
+    const response = await api.put('/user/settings', data);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to update settings');
+  }
+};
+
 export default api;
+
+

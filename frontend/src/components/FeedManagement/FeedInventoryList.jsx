@@ -22,7 +22,7 @@ const FeedInventoryList = () => {
   const fetchFeedData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/feed-inventory"); // Replace with actual endpoint
+      const response = await axios.get("/api/feed-inventory"); // Ensure this API is correct
       setFeedData(response.data);
     } catch (error) {
       console.error("Error fetching feed inventory data:", error);

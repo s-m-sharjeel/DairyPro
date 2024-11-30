@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { TextField, Button, Box, CircularProgress, Typography } from '@mui/material';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,11 +13,11 @@ const Login = () => {
   const { user, login } = useAuth();
 
   useEffect(() => {
-    // Redirect to dashboard if already logged in
-    if (user.isAuthenticated) {
-      navigate('/');
+    // Redirect to home if already logged in
+    if (user?.isAuthenticated) {
+      navigate('/home'); // Redirect to home page after login
     }
-  }, [user.isAuthenticated, navigate]);
+  }, [user, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,13 +38,8 @@ const Login = () => {
     }
 
     try {
-      const response = await login(formData.email, formData.password); // login function now returns a response
-      if (response.success) {
-        alert('Login Successful. Welcome back!');
-        navigate('/'); // Navigate to dashboard after successful login
-      } else {
-        alert('Login Failed. Invalid credentials.');
-      }
+      await login(formData); // login now accepts formData
+      navigate('/home'); // Navigate to home page after successful login
     } catch (error) {
       alert('Error. Something went wrong. Please try again later.');
     } finally {
@@ -52,40 +48,42 @@ const Login = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f0f0f0' }}>
-      <div style={{ padding: '20px', backgroundColor: 'white', borderRadius: '8px', width: '100%', maxWidth: '400px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Login</h2>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f0f0f0' }}>
+      <Box sx={{ padding: '20px', backgroundColor: 'white', borderRadius: '8px', width: '100%', maxWidth: '400px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
+        <Typography variant="h5" sx={{ textAlign: 'center', marginBottom: '20px' }}>Login</Typography>
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              style={{ width: '100%', padding: '8px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ddd' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '25px' }}>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-              style={{ width: '100%', padding: '8px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ddd' }}
-            />
-          </div>
-
-          <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '4px' }} disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
+          <TextField
+            label="Email Address"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            sx={{ marginBottom: '15px' }}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            sx={{ marginBottom: '25px' }}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ backgroundColor: '#007BFF', color: 'white', '&:hover': { backgroundColor: '#0056b3' } }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : 'Login'}
+          </Button>
         </form>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
