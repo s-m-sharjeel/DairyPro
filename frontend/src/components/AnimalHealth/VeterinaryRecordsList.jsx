@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField } from "@mui/material";
+import { 
+  Box, 
+  Typography, 
+  CircularProgress, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  TextField, 
+  Button 
+} from "@mui/material";
 import axios from "../../services/api";
 
 const VeterinaryRecordsList = () => {
@@ -8,19 +21,30 @@ const VeterinaryRecordsList = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const fetchRecords = async () => {
-      try {
-        const response = await axios.get("/veterinary-records"); // Replace with your actual endpoint
-        setRecords(response.data);
-      } catch (error) {
-        console.error("Error fetching veterinary records:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRecords();
   }, []);
+
+  const fetchRecords = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("/veterinaryRecords");
+      setRecords(response.data);
+    } catch (error) {
+      console.error("Error fetching veterinary records:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteRecord = async (VRID) => {
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
+    try {
+      await axios.delete(`/veterinaryRecords/${VRID}`);
+      setRecords((prevRecords) => prevRecords.filter((record) => record.VRID !== VRID));
+    } catch (error) {
+      console.error("Error deleting record:", error);
+    }
+  };
 
   const filteredRecords = records.filter(
     (record) =>
@@ -68,6 +92,7 @@ const VeterinaryRecordsList = () => {
               <TableCell>Symptoms</TableCell>
               <TableCell>Diagnosis</TableCell>
               <TableCell>Treatment</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -80,6 +105,15 @@ const VeterinaryRecordsList = () => {
                 <TableCell>{record.symptoms}</TableCell>
                 <TableCell>{record.diagnosis}</TableCell>
                 <TableCell>{record.treatment}</TableCell>
+                <TableCell>
+                  <Button 
+                    variant="contained" 
+                    color="secondary" 
+                    onClick={() => deleteRecord(record.VRID)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

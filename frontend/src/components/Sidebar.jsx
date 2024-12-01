@@ -1,13 +1,13 @@
-// Sidebar Component
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import classNames from 'classnames'; // Add this import
 import './Sidebar.css'; // Include styles for the sidebar
 
 // Icons for navigation items
 import { FaTachometerAlt, FaSeedling, FaClipboard, FaDatabase, FaClinicMedical, FaChartLine } from 'react-icons/fa';
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true); // Set default state as collapsed
   const [activeCategory, setActiveCategory] = useState(null);
 
   const toggleSidebar = () => {
@@ -23,7 +23,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className={classNames('sidebar', { 'collapsed': isCollapsed })}>
       <button className="toggle-btn" onClick={toggleSidebar}>
         {isCollapsed ? '➡️' : '⬅️'}
       </button>

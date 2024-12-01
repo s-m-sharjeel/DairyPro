@@ -4,9 +4,9 @@ require("dotenv").config();
 async function initialize() {
   try {
     await oracledb.createPool({
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      connectString: process.env.DB_CONNECTION_STRING,
+      user: "c##first",
+      password: "123",
+      connectString: "localhost:1521/oracl",
     });
     console.log("Connected to OracleDB");
   } catch (err) {

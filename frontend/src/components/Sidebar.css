@@ -91,23 +91,12 @@ a:hover {
   color: #ffffff;
 }
 
-/* Span visibility for collapsed sidebar */
-span {
-  font-size: 16px;
-  transition: opacity 0.3s ease;
-}
-
 /* Hide span text completely when collapsed */
 .sidebar.collapsed span {
   display: none;
 }
 
-/* Bold text on hover for nav items */
-.nav-item:hover span {
-  font-weight: bold;
-}
-
-/* Ensure that icon and text are separated correctly when collapsed */
+/* Ensure the icon and text are separated correctly when collapsed */
 .sidebar.collapsed .nav-item .icon {
   margin-right: 0; /* Remove space between icon and text */
 }
