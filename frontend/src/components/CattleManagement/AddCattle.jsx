@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button, TextField, FormControl, InputLabel, Select, MenuItem, Grid, Typography, Snackbar, Alert } from '@mui/material';
-import axios from "../../services/api"; // Assuming axios is set up for API calls
+import { Button, TextField, Grid, Typography, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { addCattle } from "../../services/api"; // Importing the API function for adding cattle
 
 const AddCattle = () => {
   const [cattleData, setCattleData] = useState({
@@ -12,10 +12,9 @@ const AddCattle = () => {
     feed: '',
     feedConsumption: '',
   });
-  
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -35,16 +34,28 @@ const AddCattle = () => {
       return;
     }
 
+    // Prepare data in the correct format before sending to the backend
+    const formattedData = {
+      type: cattleData.type,
+      breed: cattleData.breed,
+      age: parseInt(cattleData.age),
+      weight: parseInt(cattleData.weight),
+      feed: parseInt(cattleData.feed),
+      feedConsumption: parseInt(cattleData.feedConsumption),
+    };
+
     try {
-      await axios.post("/api/cattle", cattleData);  // Assuming this endpoint exists
+      const response = await addCattle(formattedData);  // Use the API function to post data
+
+      // If the request is successful, show a success message
       setSuccess(true);
-      setTimeout(() => navigate('/cattle-list'), 2000); // Redirect after success
+
+      // Redirect after success
+      setTimeout(() => navigate('/cattle-list'), 2000);
     } catch (err) {
       console.error('Error adding cattle:', err.message);
-      console.error(err.stack);
-      throw err;
-   }
-   
+      setError("Failed to add cattle.");
+    }
   };
 
   return (

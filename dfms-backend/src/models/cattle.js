@@ -1,21 +1,42 @@
 const { getConnection } = require('../db'); // Importing the database connection utility
+const oracledb = require("oracledb");
+
 
 // Function to Add Cattle (CREATE)
 async function addCattle(type, breed, age, weight, feed, feedConsumption) {
   let connection;
   try {
-    connection = await getConnection();
-    await connection.execute(
-      `BEGIN AddCattle(:type, :breed, :age, :weight, :feed, :feedConsumption); END;`,
-      { type, breed, age, weight, feed, feedConsumption },
+    connection = await oracledb.getConnection({
+      user: 'c##proj',
+      password: '123',
+      connectString: 'localhost:1521/oracl', // Change this to your DB's connect string
+    });
+    console.log('Connection obtained');
+    
+    const result = await connection.execute(
+      `INSERT INTO cattle (cattleID, type, breed, age, weight, feedID, feedConsumption) 
+       VALUES (cattle_seq.NEXTVAL, :type, :breed, :age, :weight, :feed, :feedConsumption) 
+       RETURNING cattleID INTO :cattleID`,
+      {
+        type,
+        breed,
+        age,
+        weight,
+        feed,
+        feedConsumption,
+        cattleID: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+      },
       { autoCommit: true }
     );
+
+    console.log('Cattle added with ID:', result.outBinds.cattleID[0]);
+
   } catch (err) {
     console.error('Error adding cattle:', err);
     throw err;
   } finally {
     if (connection) {
-      await connection.close();
+      await connection.close(); // Close the connection when done
     }
   }
 }
