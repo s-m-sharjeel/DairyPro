@@ -1,145 +1,110 @@
-import { useState } from "react";
-import {
-  Flex,
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  Button,
-  Heading,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Import the custom AuthContext
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { TextField, Button, Box, CircularProgress, Typography } from '@mui/material';
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const toast = useToast();
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth(); // Access login function from AuthContext
+  const { user, login } = useAuth();
+
+  useEffect(() => {
+    if (user?.isAuthenticated) {
+      navigate('/home');
+    }
+  }, [user, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    // Basic validation for email and password
+    setError('');
+  
     if (!formData.email || !formData.password) {
-      toast({
-        title: "Field Error",
-        description: "Please fill in both email and password.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      setError('Please enter both email and password.');
       setLoading(false);
       return;
     }
-
+  
     try {
-      // Assuming `login` function in context handles API calls and updates context
-      const response = await login(formData.email, formData.password);
-      if (response?.token) {
-        toast({
-          title: "Login Successful",
-          description: "Welcome back!",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        navigate("/dashboard"); // Navigate to dashboard on successful login
-      } else {
-        toast({
-          title: "Login Failed",
-          description: "Invalid credentials. Please try again.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      await login(formData);
+      navigate('/home'); // Navigate to home on successful login
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again later.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      setError(error.message); // Display error from API
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
-    <Flex
-      minH={"100vh"}
-      align={"center"}
-      justify={"center"}
-      bg={"gray.50"}
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#f0f0f0',
+      }}
     >
       <Box
-        p={8}
-        borderRadius="md"
-        boxShadow="lg"
-        bg="white"
-        width="100%"
-        maxWidth="400px"
+        sx={{
+          padding: '20px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          width: '100%',
+          maxWidth: '400px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        }}
       >
-        <Heading mb={6} textAlign="center">
+        <Typography variant="h5" sx={{ textAlign: 'center', marginBottom: '20px' }}>
           Login
-        </Heading>
+        </Typography>
+        {error && <Typography color="error" sx={{ marginBottom: '10px' }}>{error}</Typography>}
         <form onSubmit={handleSubmit}>
-          <FormControl id="email" isRequired mb={4}>
-            <FormLabel>Email Address</FormLabel>
-            <Input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-            />
-          </FormControl>
-
-          <FormControl id="password" isRequired mb={6}>
-            <FormLabel>Password</FormLabel>
-            <Input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-            />
-          </FormControl>
-
+          <TextField
+            label="Email Address"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            sx={{ marginBottom: '15px' }}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            sx={{ marginBottom: '25px' }}
+          />
           <Button
-            width="100%"
-            colorScheme="teal"
-            isLoading={loading}
             type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ backgroundColor: '#007BFF', color: 'white', '&:hover': { backgroundColor: '#0056b3' } }}
+            disabled={loading}
           >
-            Login
+            {loading ? <CircularProgress size={24} /> : 'Login'}
           </Button>
         </form>
-
-        <Text mt={4} textAlign="center">
-          Don't have an account?{" "}
-          <Button variant="link" color="teal.500" onClick={() => navigate("/register")}>
-            Register
-          </Button>
-        </Text>
       </Box>
-    </Flex>
+    </Box>
   );
+
+
+  
 };
+
+
 
 export default Login;

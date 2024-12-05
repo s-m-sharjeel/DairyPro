@@ -12,10 +12,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data for the dashboard
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get("/api/cattle"); // Update endpoint based on your backend API
+        const response = await axios.get("/dashboard-data");
         setDashboardData(response.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -43,7 +42,7 @@ const Dashboard = () => {
   }
 
   return (
-    <Box sx={{ padding: "20px" }}>
+    <Box sx={{ padding: "20px", flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
         Dashboard Overview
       </Typography>
@@ -55,27 +54,21 @@ const Dashboard = () => {
               <Typography variant="h6" color="textSecondary" gutterBottom>
                 Total Milk Produced
               </Typography>
-              <Typography variant="h4" color="primary">
-                {dashboardData.totalMilkProduced} L
-              </Typography>
+              <Typography variant="h5">{dashboardData.totalMilkProduced}</Typography>
             </CardContent>
           </Card>
         </Grid>
-
-        {/* Average Quality */}
+        {/* Average Milk Quality */}
         <Grid item xs={12} md={6} lg={3}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary" gutterBottom>
                 Average Milk Quality
               </Typography>
-              <Typography variant="h4" color="primary">
-                {dashboardData.averageQuality} / 10
-              </Typography>
+              <Typography variant="h5">{dashboardData.averageQuality}</Typography>
             </CardContent>
           </Card>
         </Grid>
-
         {/* Health Alerts */}
         <Grid item xs={12} md={6} lg={3}>
           <Card>
@@ -83,23 +76,18 @@ const Dashboard = () => {
               <Typography variant="h6" color="textSecondary" gutterBottom>
                 Health Alerts
               </Typography>
-              <Typography variant="h4" color="error">
-                {dashboardData.healthAlerts}
-              </Typography>
+              <Typography variant="h5">{dashboardData.healthAlerts}</Typography>
             </CardContent>
           </Card>
         </Grid>
-
-        {/* Feed Inventory */}
+        {/* Feed Inventory Status */}
         <Grid item xs={12} md={6} lg={3}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary" gutterBottom>
                 Feed Inventory Status
               </Typography>
-              <Typography variant="h4" color="primary">
-                {dashboardData.feedInventoryStatus} %
-              </Typography>
+              <Typography variant="h5">{dashboardData.feedInventoryStatus}</Typography>
             </CardContent>
           </Card>
         </Grid>

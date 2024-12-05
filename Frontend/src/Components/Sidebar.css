@@ -1,63 +1,102 @@
+/* General Sidebar Styles */
 .sidebar {
-    width: 250px;
-    height: 100vh;
-    background-color: #2c3e50;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    padding: 10px;
-    transition: width 0.3s ease-in-out;
-  }
-  
-  .sidebar.collapsed {
-    width: 80px;
-  }
-  
-  .toggle-btn {
-    background-color: transparent;
-    color: white;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    margin-bottom: 20px;
-    align-self: flex-end;
-  }
-  
-  .nav-list {
-    list-style: none;
-    padding: 0;
-    width: 100%;
-  }
-  
-  .nav-list li {
-    margin: 10px 0;
-  }
-  
-  .nav-list li a {
-    text-decoration: none;
-    color: white;
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease-in-out;
-  }
-  
-  .nav-list li a:hover, .nav-list li a.active {
-    background-color: #34495e;
-  }
-  
-  .icon {
-    margin-right: 10px;
-    font-size: 1.2rem;
-  }
-  
-  .sidebar.collapsed .icon {
-    margin-right: 0;
-  }
-  
-  .sidebar.collapsed span {
-    display: none;
-  }
-  
+  width: 60px; /* Set the collapsed width by default */
+  height: 100vh;
+  background-color: #2c3e50;
+  color: white;
+  transition: all 0.3s ease;
+  padding-top: 80px;
+  position: relative;
+  z-index: 1000;
+}
+
+/* Expand the sidebar when hovered */
+.sidebar:hover {
+  width: 250px; /* Set the expanded width */
+}
+
+/* Remove the collapsed state class */
+.sidebar.collapsed {
+  width: 60px; /* Set the width for the collapsed state */
+}
+
+/* The toggle button remains hidden or minimal in collapsed state */
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* The nav-list remains the same */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* General styling for each nav item */
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect for nav items */
+.nav-item:hover {
+  background-color: #34495e;
+}
+
+/* Icons for nav items */
+.nav-item .icon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+/* Sub-menu styles */
+.sub-menu {
+  list-style: none;
+  padding-left: 20px;
+}
+
+.sub-menu li {
+  padding: 10px;
+}
+
+.sub-menu li:hover {
+  background-color: #0f7892;
+}
+
+/* Active state */
+.active {
+  background-color: #42757156;
+}
+
+/* Links styling */
+a {
+  text-decoration: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+/* Hide span text completely when collapsed */
+.sidebar.collapsed span {
+  display: none;
+}
+
+/* Ensure the icon and text are separated correctly when collapsed */
+.sidebar.collapsed .nav-item .icon {
+  margin-right: 0; /* Remove space between icon and text */
+}

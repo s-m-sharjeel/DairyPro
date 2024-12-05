@@ -1,148 +1,145 @@
-import React, { useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Grid,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import axios from "../../services/api";
+import React, { useState } from 'react';
+import { Button, TextField, FormControl, InputLabel, Select, MenuItem, Grid, Typography } from '@mui/material';
+import { useMutation } from 'react-query';
+import axios from "../../services/api"; // Make sure this is correctly set up
+import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
 
-// haven't yet implemented backend for this
-const AddMilkProduction = () => {
-  const [cowId, setCowId] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [qualityTestResult, setQualityTestResult] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+const AddCattle = () => {
+  const [cattleData, setCattleData] = useState({
+    type: '',
+    breed: '',
+    age: '',
+    weight: '',
+    feed: '',
+    feedConsumption: '',
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const navigate = useNavigate(); // Replace useHistory with useNavigate
 
-    // Validate inputs
-    if (!cowId || !date || !time || !quantity || !qualityTestResult) {
-      setError("All fields are required");
-      return;
-    }
-
+  // Define the addCattle function here
+  const addCattle = async (cattleData) => {
     try {
-      // API call to add milk production record
-      const response = await axios.post("/milkProduction", {
-        cowId,
-        date,
-        time,
-        quantity: parseFloat(quantity),
-        qualityTestResult: parseFloat(qualityTestResult),
-      });
-
-      if (response.status === 201) {
-        setSuccess(true);
-        setCowId("");
-        setDate("");
-        setTime("");
-        setQuantity("");
-        setQualityTestResult("");
-        setError("");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong");
+      const response = await axios.post("/cattle", cattleData); // Make sure the endpoint is correct
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to add cattle");
     }
   };
 
+  const { mutate: addNewCattle, isLoading, isError, error } = useMutation(addCattle, {
+    onSuccess: () => {
+      // On success, redirect or show a success message
+      navigate('/cattle'); // Use navigate to redirect to cattle list page
+    },
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCattleData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    addNewCattle(cattleData);
+  };
+
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        Add Milk Production
+    <div style={{ padding: '20px' }}>
+      <Typography variant="h4" gutterBottom>
+        Add New Cattle
       </Typography>
+
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Type (Cow/Bull/Offspring)"
+              name="type"
+              value={cattleData.type}
+              onChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Breed"
+              name="breed"
+              value={cattleData.breed}
+              onChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Age"
+              name="age"
+              type="number"
+              value={cattleData.age}
+              onChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Weight"
+              name="weight"
+              type="number"
+              value={cattleData.weight}
+              onChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
-              <InputLabel id="cowId-label">Cow ID</InputLabel>
+              <InputLabel>Feed</InputLabel>
               <Select
-                labelId="cowId-label"
-                value={cowId}
-                onChange={(e) => setCowId(e.target.value)}
-                label="Cow ID"
+                label="Feed"
+                name="feed"
+                value={cattleData.feed}
+                onChange={handleChange}
+                required
               >
-                {/* Replace with dynamic list of cows */}
-                <MenuItem value={1}>Cow 1</MenuItem>
-                <MenuItem value={2}>Cow 2</MenuItem>
-                <MenuItem value={3}>Cow 3</MenuItem>
+                {/* Populate feed options dynamically (could come from the backend API) */}
+                <MenuItem value="Feed1">Feed1</MenuItem>
+                <MenuItem value="Feed2">Feed2</MenuItem>
+                <MenuItem value="Feed3">Feed3</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <TextField
-              label="Date"
-              type="date"
               fullWidth
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Time"
-              type="time"
-              fullWidth
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Quantity (L)"
+              label="Feed Consumption"
+              name="feedConsumption"
               type="number"
-              fullWidth
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              inputProps={{ min: 0, step: 0.1 }}
+              value={cattleData.feedConsumption}
+              onChange={handleChange}
+              required
             />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Quality Test Result"
-              type="number"
-              fullWidth
-              value={qualityTestResult}
-              onChange={(e) => setQualityTestResult(e.target.value)}
-              inputProps={{ min: 0, max: 100, step: 0.1 }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              Add Record
-            </Button>
           </Grid>
         </Grid>
+
+        {isError && <Typography color="error">{error.message}</Typography>}
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+          sx={{ marginTop: '20px' }}
+        >
+          {isLoading ? 'Adding...' : 'Add Cattle'}
+        </Button>
       </form>
-      {success && (
-        <Snackbar open autoHideDuration={3000} onClose={() => setSuccess(false)}>
-          <Alert severity="success" sx={{ width: "100%" }}>
-            Milk production record added successfully!
-          </Alert>
-        </Snackbar>
-      )}
-      {error && (
-        <Snackbar open autoHideDuration={3000} onClose={() => setError("")}>
-          <Alert severity="error" sx={{ width: "100%" }}>
-            {error}
-          </Alert>
-        </Snackbar>
-      )}
-    </Box>
+    </div>
   );
 };
 
-export default AddMilkProduction;
+export default AddCattle;

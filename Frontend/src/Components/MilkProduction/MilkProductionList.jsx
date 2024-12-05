@@ -1,5 +1,3 @@
-// src/components/MilkProduction/MilkProductionList.jsx
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -24,7 +22,7 @@ const MilkProductionList = () => {
   const fetchMilkProductionData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/milkProduction"); // Replace with actual endpoint
+      const response = await axios.get("http://localhost:3001/api/milkproduction");
       setMilkProductionData(response.data);
     } catch (error) {
       console.error("Error fetching milk production data:", error);
@@ -94,12 +92,12 @@ const MilkProductionList = () => {
               </TableRow>
             ) : milkProductionData.length > 0 ? (
               milkProductionData.map((record) => (
-                <TableRow key={record.MPID}>
-                  <TableCell align="center">{record.cowID}</TableCell>
+                <TableRow key={record.cowId}>
+                  <TableCell align="center">{record.cowId}</TableCell>
                   <TableCell align="center">{record.date}</TableCell>
                   <TableCell align="center">{record.time}</TableCell>
-                  <TableCell align="center">{record.quantity}</TableCell>
-                  <TableCell align="center">{record.qualityTestResult}</TableCell>
+                  <TableCell align="center">{record.totalMilk}</TableCell>
+                  <TableCell align="center">{record.avgQuality}</TableCell>
                 </TableRow>
               ))
             ) : (

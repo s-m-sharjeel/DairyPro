@@ -1,100 +1,156 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Badge } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import { useAuth } from '../context/AuthContext';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import SettingsIcon from '@mui/icons-material/Settings';
 
-const Navbar = ({ isLoggedIn, onLoginToggle }) => {
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const handleMobileMenuToggle = () => {
-    setMobileMenuOpen((prevOpen) => !prevOpen);
+  // For handling dropdown menu on the right side
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorElNotifications, setAnchorElNotifications] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const openNotifications = Boolean(anchorElNotifications);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleNotificationsOpen = (event) => {
+    setAnchorElNotifications(event.currentTarget);
+  };
+
+  const handleNotificationsClose = () => {
+    setAnchorElNotifications(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    handleMenuClose();
   };
 
   return (
-    <nav className="bg-blue-800 p-4 fixed top-0 w-full z-10">
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo and Brand */}
-        <div className="flex items-center">
-          <img
-            src="https://example.com/dairypro-logo.png" // Replace with actual logo URL
-            alt="Dairy Pro Logo"
-            className="h-10 mr-4"
-          />
-          <span className="text-white font-bold text-lg">Dairy Pro</span>
-        </div>
+    <AppBar position="sticky" sx={{ backgroundColor: '#1976d2' }}>
+      <Toolbar>
+        {/* Left side menu icon */}
+        <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+          <MenuIcon />
+        </IconButton>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex space-x-4">
-          <Link to="/dashboard" className="text-white">
-            Dashboard
-          </Link>
-          <Link to="/milk-production" className="text-white">
-            Milk Production
-          </Link>
-          <Link to="/feed-management" className="text-white">
-            Feed Management
-          </Link>
-          {isLoggedIn ? (
-            <button className="text-white" onClick={onLoginToggle}>
-              Logout
-            </button>
+        {/* App name */}
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          DairyPro
+        </Typography>
+
+        {/* Right side profile and navigation buttons */}
+        <Box sx={{ display: 'flex' }}>
+          {user?.isAuthenticated ? (
+            <>
+              <Button
+                component={Link}
+                to="/home"
+                color="inherit"
+                sx={{ marginRight: 2 }}
+              >
+                Home
+              </Button>
+              <Button
+                component={Link}
+                to="/dashboard"
+                color="inherit"
+                sx={{ marginRight: 2 }}
+              >
+                Dashboard
+              </Button>
+              
+              {/* Button for Notifications with Badge */}
+              <IconButton 
+                color="inherit" 
+                onClick={handleNotificationsOpen}
+                sx={{ marginRight: 2 }}
+              >
+                <Badge badgeContent={4} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+
+              {/* Button for Settings */}
+              <IconButton
+                color="inherit"
+                component={Link}
+                to="/settings"
+                sx={{ marginRight: 2 }}
+              >
+                <SettingsIcon />
+              </IconButton>
+
+              {/* Profile button with dropdown menu */}
+              <Button
+                color="inherit"
+                onClick={handleMenuOpen}
+                sx={{ marginRight: 2 }}
+              >
+                {user?.username}
+              </Button>
+
+              {/* Dropdown menu */}
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+              >
+                <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+
+              {/* Notifications Dropdown */}
+              <Menu
+                anchorEl={anchorElNotifications}
+                open={openNotifications}
+                onClose={handleNotificationsClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-notifications-button',
+                }}
+              >
+                <MenuItem onClick={handleNotificationsClose}>Notification 1</MenuItem>
+                <MenuItem onClick={handleNotificationsClose}>Notification 2</MenuItem>
+                <MenuItem onClick={handleNotificationsClose}>Notification 3</MenuItem>
+              </Menu>
+            </>
           ) : (
-            <Link to="/signin">
-              <button className="text-white" onClick={onLoginToggle}>
+            <>
+              <Button
+                component={Link}
+                to="/login"
+                color="inherit"
+                sx={{ marginRight: 2 }}
+              >
                 Login
-              </button>
-            </Link>
+              </Button>
+              <Button
+                component={Link}
+                to="/register"
+                color="inherit"
+              >
+                Register
+              </Button>
+            </>
           )}
-        </div>
-
-        {/* Mobile Menu Toggle */}
-        <div className="md:hidden">
-          <button
-            onClick={handleMobileMenuToggle}
-            className="text-white focus:outline-none"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16m-7 6h7"
-              ></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-blue-700 p-4">
-          <Link to="/dashboard" className="text-white block mb-2">
-            Dashboard
-          </Link>
-          <Link to="/milk-production" className="text-white block mb-2">
-            Milk Production
-          </Link>
-          <Link to="/feed-management" className="text-white block mb-2">
-            Feed Management
-          </Link>
-          {isLoggedIn ? (
-            <button className="text-white block" onClick={onLoginToggle}>
-              Logout
-            </button>
-          ) : (
-            <Link to="/signin">
-              <button className="text-white block" onClick={onLoginToggle}>
-                Login
-              </button>
-            </Link>
-          )}
-        </div>
-      )}
-    </nav>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
 
