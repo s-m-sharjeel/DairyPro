@@ -3,34 +3,76 @@ const oracledb = require("oracledb");
 
 
 // Function to Add Cattle (CREATE)
-async function addCattle(type, breed, age, weight, feed, feedConsumption) {
+// async function addCattle(type, breed, age, weight, feed, feedConsumption) {
+//   let connection;
+//   try {
+//     connection = await oracledb.getConnection({
+//       user: 'c##proj',
+//       password: '123',
+//       connectString: 'localhost:1521/oracl', // Change this to your DB's connect string
+//     });
+//     console.log('Connection obtained');
+    
+//     const result = await connection.execute(
+//       `INSERT INTO cattle (cattleID, type, breed, age, weight, feedID, feedConsumption) 
+//        VALUES (cattle_seq.NEXTVAL, :type, :breed, :age, :weight, :feed, :feedConsumption) 
+//        RETURNING cattleID INTO :cattleID`,
+//       {
+//         type,
+//         breed,
+//         age,
+//         weight,
+//         feed,
+//         feedConsumption,
+//         cattleID: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+//       },
+//       { autoCommit: true }
+//     );
+
+//     console.log('Cattle added with ID:', result.outBinds.cattleID[0]);
+
+//   } catch (err) {
+//     console.error('Error adding cattle:', err);
+//     throw err;
+//   } finally {
+//     if (connection) {
+//       await connection.close(); // Close the connection when done
+//     }
+//   }
+// }
+
+async function addCattle(type, breed, age, weight, feed, feedConsumption, lactationStatus) {
   let connection;
   try {
     connection = await oracledb.getConnection({
       user: 'c##proj',
       password: '123',
-      connectString: 'localhost:1521/oracl', // Change this to your DB's connect string
+      connectString: 'localhost:1521/oracl', // Update with your DB's connect string
     });
     console.log('Connection obtained');
     
+    // Debugging the lactationStatus before calling the procedure
+    console.log('LactationStatus:', lactationStatus);
+    
     const result = await connection.execute(
-      `INSERT INTO cattle (cattleID, type, breed, age, weight, feedID, feedConsumption) 
-       VALUES (cattle_seq.NEXTVAL, :type, :breed, :age, :weight, :feed, :feedConsumption) 
-       RETURNING cattleID INTO :cattleID`,
+      `BEGIN 
+         AddCattle(:type, :breed, :age, :weight, :feed, :feedConsumption, :lactationStatus); 
+       END;`, 
       {
-        type,
-        breed,
-        age,
-        weight,
-        feed,
-        feedConsumption,
-        cattleID: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+        type: type,
+        breed: breed,
+        age: age,
+        weight: weight,
+        feed: parseInt(feed, 10),  // Ensure feed is passed as an integer
+        feedConsumption: feedConsumption,
+        lactationStatus: lactationStatus
       },
-      { autoCommit: true }
+      {
+        autoCommit: true
+      }
     );
-
-    console.log('Cattle added with ID:', result.outBinds.cattleID[0]);
-
+    
+    console.log('Cattle added successfully');
   } catch (err) {
     console.error('Error adding cattle:', err);
     throw err;
@@ -40,6 +82,11 @@ async function addCattle(type, breed, age, weight, feed, feedConsumption) {
     }
   }
 }
+
+
+
+
+
 
 // Function to Get All Cattle (READ)
 async function getAllCattle() {
@@ -117,43 +164,66 @@ async function updateCattle(cattleID, type, breed, age, weight, feed, feedConsum
   }
 }
 
-// Function to Delete Cattle (DELETE)
 async function deleteCattle(cattleID) {
   let connection;
   try {
     connection = await getConnection();
 
-    // Step 1: Delete references in BreedingRecords
+    // Step 1: Call the DeleteCattle procedure
     await connection.execute(
-      `DELETE FROM BreedingRecords WHERE CowID = :cattleID OR BullID = :cattleID`,
-      [cattleID, cattleID],
+      `BEGIN DeleteCattle(:cattleID); END;`, // Call the procedure using the anonymous PL/SQL block
+      {
+        cattleID: cattleID // Bind the cattleID to the procedure
+      },
       { autoCommit: true }
     );
-
-    // Step 2: Delete references in MilkProduction (assuming CattleID is referenced as CowID)
-    await connection.execute(
-      `DELETE FROM MilkProduction WHERE CowID = :cattleID`,
-      [cattleID],
-      { autoCommit: true }
-    );
-
-    // Step 3: Now delete the parent record in Cattle
-    await connection.execute(
-      `DELETE FROM Cattle WHERE CattleID = :cattleID`,
-      [cattleID],
-      { autoCommit: true }
-    );
-
+    console.log('Cattle deleted successfully');
   } catch (err) {
     console.error('Error deleting cattle:', err);
-    throw err;  // rethrow the error for handling in the controller
+    throw err;
   } finally {
     if (connection) {
-      await connection.close();
+      await connection.close(); // Close the connection when done
     }
   }
 }
 
+// Function to Delete Cattle (DELETE)
+// async function deleteCattle(cattleID) {
+//   let connection;
+//   try {
+//     connection = await getConnection();
+
+//     // Step 1: Delete references in BreedingRecords
+//     await connection.execute(
+//       'DELETE FROM BreedingRecords WHERE CowID = :cattleID OR BullID = :cattleID',
+//       [cattleID, cattleID],
+//       { autoCommit: true }
+//     );
+
+//     // Step 2: Delete references in MilkProduction (assuming CattleID is referenced as CowID)
+//     await connection.execute(
+//       'DELETE FROM MilkProduction WHERE CowID = :cattleID',
+//       [cattleID],
+//       { autoCommit: true }
+//     );
+
+//     // Step 3: Now delete the parent record in Cattle
+//     await connection.execute(
+//      ' DELETE FROM Cattle WHERE CattleID = :cattleID',
+//       [cattleID],
+//       { autoCommit: true }
+//     );
+
+//   } catch (err) {
+//     console.error('Error deleting cattle:', err);
+//     throw err;  // rethrow the error for handling in the controller
+//   } finally {
+//     if (connection) {
+//       await connection.close();
+//     }
+//   }
+// }
 
 module.exports = {
   addCattle,
