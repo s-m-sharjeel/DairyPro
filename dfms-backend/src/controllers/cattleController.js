@@ -55,10 +55,10 @@ async function updateCattle(req, res) {
 
 // DELETE request handler for deleting cattle (DELETE)
 async function deleteCattle(req, res) {
-    const { id } = req.params; 
-    console.log('id ', id);// Extract the cattle ID from the URL parameters
+    const { cattleID } = req.params; 
+    console.log('id ', cattleID);// Extract the cattle ID from the URL parameters
     try {
-      await cattleModel.deleteCattle(id); // Call the delete function in the model
+      await cattleModel.deleteCattle(cattleID); // Call the delete function in the model
       res.send('Cattle deleted successfully');
     } catch (err) {
       console.error('Error deleting cattle:', err); // Log error if any

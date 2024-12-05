@@ -41,9 +41,16 @@ const CattleList = () => {
   };
 
   // Delete cattle
-  const handleDeleteCattle = async (cattleID) => {
+  const handleDeleteCattle = async () => {
+    // Check if selectedCattleID is properly set
+    if (!selectedCattleID) {
+      console.error('Cattle ID is not set');
+      return;
+    }
+  
     try {
-      await axios.delete(`http://localhost:3001/api/cattle/${cattleID}`);
+      console.log(`Deleting cattle with ID: ${selectedCattleID}`);
+      await axios.delete(`http://localhost:3001/api/cattle/${selectedCattleID}`);
       console.log("Cattle deleted successfully!");
       fetchCattleData();  // Refresh cattle list after deletion
       setOpenDialog(false); // Close confirmation dialog
@@ -51,6 +58,7 @@ const CattleList = () => {
       console.error("Error deleting cattle:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchCattleData();
@@ -158,7 +166,7 @@ const CattleList = () => {
             Cancel
           </Button>
           <Button
-            onClick={() => handleDeleteCattle(selectedCattleID)}
+            onClick={handleDeleteCattle}
             color="secondary"
           >
             Delete

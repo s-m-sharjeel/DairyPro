@@ -146,13 +146,14 @@ async function deleteCattle(cattleID) {
 
   } catch (err) {
     console.error('Error deleting cattle:', err);
-    throw err;
+    throw err;  // rethrow the error for handling in the controller
   } finally {
     if (connection) {
       await connection.close();
     }
   }
 }
+
 
 module.exports = {
   addCattle,
