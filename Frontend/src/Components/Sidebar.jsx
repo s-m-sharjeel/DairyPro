@@ -28,13 +28,6 @@ const Sidebar = () => {
         {isCollapsed ? '➡️' : '⬅️'}
       </button>
       <ul className="nav-list">
-        {/* Dashboard Link */}
-        <li>
-          <NavLink to="/dashboard" activeClassName="active">
-            <FaTachometerAlt className="icon" />
-            {!isCollapsed && <span>Dashboard</span>}
-          </NavLink>
-        </li>
 
         {/* Milk Production */}
         <li

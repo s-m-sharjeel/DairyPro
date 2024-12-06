@@ -3,22 +3,22 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocat
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';  // Import QueryClientProvider
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-import Sidebar from './components/Sidebar';
-import Navbar from './components/Navbar';
+import Sidebar from './Components/Sidebar';
+import Navbar from './Components/Navbar';
 import Home from './pages/Home';
-import Dashboard from './components/Dashboard/Dashboard';
-import Settings from './components/settings/settings';
-import MilkProductionList from './components/MilkProduction/MilkProductionList';
-import AddMilkProduction from './components/MilkProduction/AddMilkProduction';
-import AddBreedingRecord from './components/BreedingManagement/AddBreedingRecord';
-import AddOffspringRecord from './components/BreedingManagement/AddOffspringRecord';
-import VeterinaryRecordsList from './components/AnimalHealth/VeterinaryRecordsList';
-import AddVeterinaryRecord from './components/AnimalHealth/AddVeterinaryRecord';
-import FeedInventoryList from './components/FeedManagement/FeedInventoryList';
-import AddFeedInventory from './components/FeedManagement/AddFeedInventory';
-import CattleList from './components/CattleManagement/CattleList';
-import AddCattle from './components/CattleManagement/AddCattle';
-import OffspringList from './components/CattleManagement/OffSpringList';
+import Dashboard from './Components/Dashboard/Dashboard';
+import Settings from './Components/settings/settings';
+import MilkProductionList from './Components/MilkProduction/MilkProductionList';
+import AddMilkProduction from './Components/MilkProduction/AddMilkProduction';
+import AddBreedingRecord from './Components/BreedingManagement/AddBreedingRecord';
+import AddOffspringRecord from './Components/BreedingManagement/AddOffspringRecord';
+import VeterinaryRecordsList from './Components/AnimalHealth/VeterinaryRecordsList';
+import AddVeterinaryRecord from './Components/AnimalHealth/AddVeterinaryRecord';
+import FeedInventoryList from './Components/FeedManagement/FeedInventoryList';
+import AddFeedInventory from './Components/FeedManagement/AddFeedInventory';
+import CattleList from './Components/CattleManagement/CattleList';
+import AddCattle from './Components/CattleManagement/AddCattle';
+import OffspringList from './Components/CattleManagement/OffSpringList';
 import Login from './pages/Login';
 import Register from './pages/Register';
 

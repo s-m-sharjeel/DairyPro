@@ -1,11 +1,12 @@
 const oracledb = require('oracledb');
+require("dotenv").config();
 
 async function getConnection() {
   try {
     const connection = await oracledb.getConnection({
-      user: 'c##proj',        // Your Oracle DB username
-      password: '123',        // Your Oracle DB password
-      connectString: 'localhost:1521/oracl' // Your Oracle connect string
+      user: process.env.DB_USER,  // Your Oracle DB username
+      password: process.env.DB_PASSWORD,  // Your Oracle DB password
+      connectString: process.env.DB_CONNECTION_STRING,  // Your Oracle connect string
     });
     return connection;
   } catch (err) {

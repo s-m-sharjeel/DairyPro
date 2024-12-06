@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 3001;
+
+require("dotenv").config();
+const port = process.env.PORT;  // run server on the port specified in env
 
 // Middleware to parse JSON body
 app.use(express.json());
