@@ -1,30 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { TextField, Button, InputLabel, FormControl } from '@mui/material';
 import axios from '../../services/api'; // Axios instance configured for API calls
 import '../../index.css'; // Optional styling
 
 const AddVeterinaryRecord = () => {
   const [cattleList, setCattleList] = useState([]);
-  const [vetsList, setVetsList] = useState([]);
   const [formData, setFormData] = useState({
     CattleID: '',
-    VetID: '',
+ // Changed to VetName for text input
     Date: '',
     Time: '',
     Symptoms: '',
     Diagnosis: '',
-    Treatment: ''
+    Treatment: '',
+    VetName: ''
   });
 
   useEffect(() => {
     // Fetch cattle list
-    axios.get('/cattle')
+    axios.get('http://localhost:3001/api/cattle')
       .then(response => setCattleList(response.data))
-      .catch(err => console.error(err));
-
-    // Fetch vet list
-    axios.get('/vets')
-      .then(response => setVetsList(response.data))
       .catch(err => console.error(err));
   }, []);
 
@@ -37,17 +32,19 @@ const AddVeterinaryRecord = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('/veterinary-records', formData)
+    // Posting the veterinary record with the form data
+    axios.post('http://localhost:3001/api/health', formData)
       .then(() => {
         alert('Veterinary record added successfully!');
         setFormData({
           CattleID: '',
-          VetID: '',
+           // Reset VetName field
           Date: '',
           Time: '',
           Symptoms: '',
           Diagnosis: '',
-          Treatment: ''
+          Treatment: '',
+          VetName: ''
         });
       })
       .catch(err => {
@@ -60,37 +57,34 @@ const AddVeterinaryRecord = () => {
     <div className="add-veterinary-record">
       <h2>Add Veterinary Record</h2>
       <form onSubmit={handleSubmit}>
+        
         <FormControl fullWidth margin="normal">
           <InputLabel>Cattle</InputLabel>
-          <Select
+          <select
             value={formData.CattleID}
             onChange={handleChange}
             name="CattleID"
             required
+            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
           >
+            <option value="" disabled>Select Cattle</option>
             {cattleList.map((cattle) => (
-              <MenuItem key={cattle.CattleID} value={cattle.CattleID}>
-                {cattle.Breed} - {cattle.CattleID}
-              </MenuItem>
+              <option key={cattle.cattleID} value={cattle.cattleID}>
+                {cattle.breed} - {cattle.cattleID}
+              </option>
             ))}
-          </Select>
+          </select>
         </FormControl>
 
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Veterinarian</InputLabel>
-          <Select
-            value={formData.VetID}
-            onChange={handleChange}
-            name="VetID"
-            required
-          >
-            {vetsList.map((vet) => (
-              <MenuItem key={vet.VetID} value={vet.VetID}>
-                {vet.Name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <TextField
+          label="Veterinarian Name"
+          name="VetName"
+          value={formData.VetName}
+          onChange={handleChange}
+          fullWidth
+          required
+          margin="normal"
+        />
 
         <TextField
           label="Date"

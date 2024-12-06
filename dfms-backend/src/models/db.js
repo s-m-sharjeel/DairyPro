@@ -1,6 +1,5 @@
 // src/db.js
 const oracledb = require('oracledb');
-const { getConnection } = require('../db'); // Importing the database connection utility
 
 async function getConnection() {
   try {

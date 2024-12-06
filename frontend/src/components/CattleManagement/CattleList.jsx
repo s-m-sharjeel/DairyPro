@@ -18,20 +18,29 @@ import {
   DialogTitle,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";  // For delete icon
+import EditIcon from "@mui/icons-material/Edit";  // For edit icon
 
 const CattleList = () => {
   const [cattleData, setCattleData] = useState([]);
   const [searchType, setSearchType] = useState("");
   const [loading, setLoading] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);  // Dialog to confirm delete
-  const [selectedCattleID, setSelectedCattleID] = useState(null); // Store selected cattle ID to delete
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);  // For edit form
+  const [selectedCattleID, setSelectedCattleID] = useState(null);
+  const [editCattle, setEditCattle] = useState({
+    type: '',
+    breed: '',
+    age: '',
+    weight: '',
+    feed: '',
+    feedConsumption: ''
+  });
 
   // Fetch cattle records from API
   const fetchCattleData = async () => {
     setLoading(true);
     try {
       const response = await axios.get("http://localhost:3001/api/cattle");
-      console.log("Fetched data:", response.data);  // Check if the data is correct
       setCattleData(response.data);
     } catch (error) {
       console.error("Error fetching cattle data:", error);
@@ -40,29 +49,30 @@ const CattleList = () => {
     }
   };
 
-  // Delete cattle
-  const handleDeleteCattle = async () => {
-    // Check if selectedCattleID is properly set
-    if (!selectedCattleID) {
-      console.error('Cattle ID is not set');
-      return;
-    }
-  
+  // Handle Edit button click
+  const handleEditCattle = (cattle) => {
+    setEditCattle({
+      type: cattle.type,
+      breed: cattle.breed,
+      age: cattle.age,
+      weight: cattle.weight,
+      feed: cattle.feed,
+      feedConsumption: cattle.feedConsumption
+    });
+    setSelectedCattleID(cattle.cattleID);
+    setOpenEditDialog(true);
+  };
+
+  // Handle the update action
+  const handleUpdateCattle = async () => {
     try {
-      console.log(`Deleting cattle with ID: ${selectedCattleID}`);
-      await axios.delete(`http://localhost:3001/api/cattle/${selectedCattleID}`);
-      console.log("Cattle deleted successfully!");
-      fetchCattleData();  // Refresh cattle list after deletion
-      setOpenDialog(false); // Close confirmation dialog
+      await axios.put(`http://localhost:3001/api/cattle/${selectedCattleID}`, editCattle);
+      fetchCattleData();  // Refresh the cattle data after the update
+      setOpenEditDialog(false); // Close the edit dialog
     } catch (error) {
-      console.error("Error deleting cattle:", error);
+      console.error("Error updating cattle:", error);
     }
   };
-  
-
-  useEffect(() => {
-    fetchCattleData();
-  }, []);
 
   // Filter cattle records by type or breed
   const handleSearch = () => {
@@ -78,6 +88,21 @@ const CattleList = () => {
     );
     setCattleData(filteredData);
   };
+
+  // Handle Delete Cattle
+  const handleDeleteCattle = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/api/cattle/${selectedCattleID}`);
+      fetchCattleData();  // Refresh the cattle data after deletion
+      setOpenDialog(false); // Close the delete confirmation dialog
+    } catch (error) {
+      console.error("Error deleting cattle:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCattleData();
+  }, []);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -111,7 +136,7 @@ const CattleList = () => {
               <TableCell align="center">Age</TableCell>
               <TableCell align="center">Weight</TableCell>
               <TableCell align="center">Feed Consumption (kg)</TableCell>
-              <TableCell align="center">Actions</TableCell> {/* For Delete Button */}
+              <TableCell align="center">Actions</TableCell> {/* For Edit and Delete buttons */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -131,12 +156,19 @@ const CattleList = () => {
                   <TableCell align="center">{record.weight}</TableCell>
                   <TableCell align="center">{record.feedConsumption || 'N/A'}</TableCell>
                   <TableCell align="center">
+                    {/* Edit Button */}
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditCattle(record)}
+                    >
+                      <EditIcon />
+                    </IconButton>
                     {/* Delete Button */}
                     <IconButton
                       color="secondary"
                       onClick={() => {
                         setSelectedCattleID(record.cattleID);
-                        setOpenDialog(true); // Open dialog for confirmation
+                        setOpenDialog(true);
                       }}
                     >
                       <DeleteIcon />
@@ -154,6 +186,67 @@ const CattleList = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Edit Cattle Dialog */}
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <DialogTitle>Edit Cattle</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Type"
+            fullWidth
+            value={editCattle.type}
+            onChange={(e) => setEditCattle({ ...editCattle, type: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Breed"
+            fullWidth
+            value={editCattle.breed}
+            onChange={(e) => setEditCattle({ ...editCattle, breed: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Age"
+            type="number"
+            fullWidth
+            value={editCattle.age}
+            onChange={(e) => setEditCattle({ ...editCattle, age: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Weight"
+            type="number"
+            fullWidth
+            value={editCattle.weight}
+            onChange={(e) => setEditCattle({ ...editCattle, weight: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Feed"
+            type="number"
+            fullWidth
+            value={editCattle.feed}
+            onChange={(e) => setEditCattle({ ...editCattle, feed: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Feed Consumption"
+            type="number"
+            fullWidth
+            value={editCattle.feedConsumption}
+            onChange={(e) => setEditCattle({ ...editCattle, feedConsumption: e.target.value })}
+            margin="dense"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleUpdateCattle} color="primary">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>

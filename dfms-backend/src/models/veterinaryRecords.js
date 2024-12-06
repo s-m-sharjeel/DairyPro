@@ -1,15 +1,37 @@
 const { getConnection } = require('../db'); // Importing the database connection utility
 
-// Function to Add a Veterinary Record (CREATE)
-async function addVeterinaryRecord(cattleID, date, time, vetID, symptoms, diagnosis, treatment) {
+async function addVeterinaryRecord(cattleID, date, time, symptoms, diagnosis, treatment, vetName) {
   let connection;
   try {
+    console.log("Adding veterinary record with the following data:");
+    console.log("CattleID:", cattleID);
+    console.log("Date:", date);
+    console.log("Time:", time);
+    console.log("Symptoms:", symptoms);
+    console.log("Diagnosis:", diagnosis);
+    console.log("Treatment:", treatment);
+    console.log("VetName:", vetName);
+
     connection = await getConnection();
+
+    // Use TO_DATE for Date and TO_TIMESTAMP for Time
     await connection.execute(
-      `BEGIN AddVeterinaryRecord(:cattleID, :date, :time, :vetID, :symptoms, :diagnosis, :treatment); END;`,
-      { cattleID, date, time, vetID, symptoms, diagnosis, treatment },
+      `BEGIN 
+         AddVeterinaryRecord(
+           :cattleID, 
+           TO_DATE(:date, 'YYYY-MM-DD'), 
+           TO_TIMESTAMP(:time, 'HH24:MI:SS'), 
+           :symptoms, 
+           :diagnosis, 
+           :treatment, 
+           :vetName
+         ); 
+       END;`,
+      { cattleID, date, time, symptoms, diagnosis, treatment, vetName },
       { autoCommit: true }
     );
+
+    console.log("Veterinary record added successfully.");
   } catch (err) {
     console.error('Error adding veterinary record:', err);
     throw err;
@@ -19,6 +41,8 @@ async function addVeterinaryRecord(cattleID, date, time, vetID, symptoms, diagno
     }
   }
 }
+
+
 
 // Function to Get All Veterinary Records (READ)
 async function getAllVeterinaryRecords() {
@@ -31,10 +55,10 @@ async function getAllVeterinaryRecords() {
       cattleID: row[1],
       date: row[2],
       time: row[3],
-      vetID: row[4],
-      symptoms: row[5],
-      diagnosis: row[6],
-      treatment: row[7]
+      symptoms: row[4],
+      diagnosis: row[5],
+      treatment: row[6],
+      vetName: row[7]
     }));
   } catch (err) {
     console.error('Error fetching veterinary records:', err);
@@ -82,8 +106,8 @@ async function updateVeterinaryRecord(vrid, cattleID, date, time, vetID, symptom
   try {
     connection = await getConnection();
     await connection.execute(
-      `BEGIN UpdateVeterinaryRecord(:vrid, :cattleID, :date, :time, :vetID, :symptoms, :diagnosis, :treatment); END;`,
-      { vrid, cattleID, date, time, vetID, symptoms, diagnosis, treatment },
+      `BEGIN UpdateVeterinaryRecord(:vrid, :cattleID, :date, :time, :symptoms, :diagnosis, :treatment,  :vetName); END;`,
+      { vrid, cattleID, date, time, vetID, symptoms, diagnosis, treatment, vetName },
       { autoCommit: true }
     );
   } catch (err) {

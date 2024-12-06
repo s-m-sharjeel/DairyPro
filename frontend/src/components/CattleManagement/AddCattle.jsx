@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextField, Grid, Typography, Snackbar, Alert } from '@mui/material';
+import { Button, TextField, Grid, Typography, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { addCattle } from "../../services/api"; // Importing the API function for adding cattle
 
@@ -11,6 +11,8 @@ const AddCattle = () => {
     weight: '',
     feed: '',
     feedConsumption: '',
+    lactationStatus: 'Lactating', // Default for Cow
+    sex: '-', // Default for Offspring
   });
 
   const [error, setError] = useState("");
@@ -34,18 +36,8 @@ const AddCattle = () => {
       return;
     }
 
-    // Prepare data in the correct format before sending to the backend
-    const formattedData = {
-      type: cattleData.type,
-      breed: cattleData.breed,
-      age: parseInt(cattleData.age),
-      weight: parseInt(cattleData.weight),
-      feed: parseInt(cattleData.feed),
-      feedConsumption: parseInt(cattleData.feedConsumption),
-    };
-
     try {
-      const response = await addCattle(formattedData);  // Use the API function to post data
+      const response = await addCattle(cattleData); // Use the API function to post data
 
       // If the request is successful, show a success message
       setSuccess(true);
@@ -63,15 +55,23 @@ const AddCattle = () => {
       <Typography variant="h4">Add Cattle</Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
+          {/* Select for Type */}
           <Grid item xs={12}>
-            <TextField
-              label="Type"
-              name="type"
-              value={cattleData.type}
-              onChange={handleChange}
-              fullWidth
-            />
+            <FormControl fullWidth>
+              <InputLabel>Type</InputLabel>
+              <Select
+                name="type"
+                value={cattleData.type}
+                onChange={handleChange}
+              >
+                <MenuItem value="Cow">Cow</MenuItem>
+                <MenuItem value="Bull">Bull</MenuItem>
+                <MenuItem value="Offspring">Offspring</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
+
+          {/* Inputs that are always shown */}
           <Grid item xs={12}>
             <TextField
               label="Breed"
@@ -119,6 +119,38 @@ const AddCattle = () => {
               fullWidth
             />
           </Grid>
+
+          {/* Conditional Inputs based on Type */}
+          {cattleData.type === 'Cow' && (
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Lactation Status</InputLabel>
+                <Select
+                  name="lactationStatus"
+                  value={cattleData.lactationStatus}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Lactating">Lactating</MenuItem>
+                  <MenuItem value="Dry">Dry</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+          {cattleData.type === 'Offspring' && (
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Sex</InputLabel>
+                <Select
+                  name="sex"
+                  value={cattleData.sex}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Male">Male</MenuItem>
+                  <MenuItem value="Female">Female</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
         </Grid>
         <div style={{ marginTop: "20px" }}>
           <Button type="submit" variant="contained">Add Cattle</Button>

@@ -1,16 +1,32 @@
 const veterinaryRecordsModel = require('../models/veterinaryRecords'); // Import the model
 
 // POST request handler for adding a veterinary record (CREATE)
+// Modify your addVeterinaryRecord function to expect keys in camelCase
 async function addVeterinaryRecord(req, res) {
-  const { cattleID, date, time, vetID, symptoms, diagnosis, treatment } = req.body;
+  // Use camelCase consistently
+  const { cattleID, date, time, symptoms, diagnosis, treatment, vetName } = req.body;
+
+  // Debugging logs
+  console.log('Request body:', req.body);
+  console.log("Adding veterinary record with the following data:");
+  console.log("CattleID:", cattleID);
+  console.log("Date:", date);
+  console.log("Time:", time);
+  console.log("Symptoms:", symptoms);
+  console.log("Diagnosis:", diagnosis);
+  console.log("Treatment:", treatment);
+  console.log("VetName:", vetName);
+
   try {
-    await veterinaryRecordsModel.addVeterinaryRecord(cattleID, date, time, vetID, symptoms, diagnosis, treatment);
+    // Call the model function with consistent naming
+    await veterinaryRecordsModel.addVeterinaryRecord(cattleID, date, time, symptoms, diagnosis, treatment, vetName);
     res.status(201).send('Veterinary record added successfully');
   } catch (err) {
     console.error('Error adding veterinary record:', err);
     res.status(500).send('Error adding veterinary record');
   }
 }
+
 
 // GET request handler for all veterinary records (READ)
 async function getAllVeterinaryRecords(req, res) {
