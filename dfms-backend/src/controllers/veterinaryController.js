@@ -28,6 +28,7 @@ async function addVeterinaryRecord(req, res) {
 }
 
 
+
 // GET request handler for all veterinary records (READ)
 async function getAllVeterinaryRecords(req, res) {
   try {
@@ -54,9 +55,9 @@ async function getVeterinaryRecordById(req, res) {
 // PUT request handler for updating a veterinary record (UPDATE)
 async function updateVeterinaryRecord(req, res) {
   const { id } = req.params;
-  const { cattleID, date, time, vetID, symptoms, diagnosis, treatment } = req.body;
+  const { cattleID, date, time, symptoms, diagnosis, treatment, vetName } = req.body;
   try {
-    await veterinaryRecordsModel.updateVeterinaryRecord(id, cattleID, date, time, vetID, symptoms, diagnosis, treatment);
+    await veterinaryRecordsModel.updateVeterinaryRecord(id, cattleID, date, time, symptoms, diagnosis, treatment, vetName);
     res.send('Veterinary record updated successfully');
   } catch (err) {
     console.error('Error updating veterinary record:', err);
@@ -66,15 +67,19 @@ async function updateVeterinaryRecord(req, res) {
 
 // DELETE request handler for deleting a veterinary record (DELETE)
 async function deleteVeterinaryRecord(req, res) {
-  const { id } = req.params; // Extract the veterinary record ID from the URL parameters
+  const { vrid } = req.params;
+  console.log('vrid:', vrid);  // Debugging log to check if vrid is being captured correctly
+  
   try {
-    await veterinaryRecordsModel.deleteVeterinaryRecord(id); // Call the delete function in the model
-    res.send('Veterinary record deleted successfully');
+    // Call the model function to delete the veterinary record
+    await veterinaryRecordsModel.deleteVeterinaryRecord(vrid);
+    res.status(200).send(`Veterinary record with ID ${vrid} deleted successfully`);
   } catch (err) {
-    console.error('Error deleting veterinary record:', err); // Log error if any
-    res.status(500).send('Error deleting veterinary record'); // Send error response
+    console.error('Error deleting veterinary record:', err);
+    res.status(500).send('Error deleting veterinary record');
   }
 }
+
 
 // Export the functions to be used in the routes
 module.exports = {

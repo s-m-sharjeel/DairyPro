@@ -164,49 +164,61 @@ async function getCattleById(cattleID) {
 //   }
 // }
 
-async function updateCattle(req, res) {
-  const { cattleID } = req.params; // Get cattleID from the URL parameters
-  const { type, breed, age, weight, feed, feedConsumption } = req.body; // Get data from request body
-  
-  // Validate that cattleID is present in the URL parameters
-  if (!cattleID) {
-    return res.status(400).send({ message: 'CattleID is required' });
-  }
-
-  // Check if all necessary fields are provided in the body
-  if (!type || !breed || !age || !weight || !feed || !feedConsumption) {
-    return res.status(400).send({ message: 'All fields are required' });
-  }
-
+async function updateCattle(cattleID, updatedData) {
   let connection;
   try {
-    // Establish database connection
-    connection = await getConnection();
+    console.log(`Fetching cattle record for cattleID: ${cattleID}`);
+    
+    // Fetch all records (assuming you have a getAllCattle function to get records)
+    const cattleRecords = await getAllCattle();
 
-    // Execute the stored procedure to update cattle
+    // Find the existing record
+    const existingRecord = cattleRecords.find(record => record.cattleID === Number(cattleID));
+    if (!existingRecord) {
+      throw new Error(`Cattle record with ID ${cattleID} not found.`);
+    }
+
+    console.log('Existing Record:', existingRecord);
+
+    // Merge existing record with updated data
+    const updatedRecord = {
+      ...existingRecord,
+      ...updatedData, // Overwrite only the updated fields
+    };
+
+    console.log('Updated Record:', updatedRecord);
+
+    // Update the record in the database
+    connection = await getConnection();
     await connection.execute(
-      `BEGIN 
-         UpdateCattle(:p_cattleID, :p_type, :p_breed, :p_age, :p_weight, :p_feed, :p_feedConsumption); 
-       END;`,
+      `BEGIN UpdateCattle(
+        :cattleID,
+        :type,
+        :breed,
+        :age,
+        :weight,
+        :feed,
+        :feedConsumption
+      ); END;`,
       {
-        p_cattleID: cattleID,  // Cattle ID from the URL parameter
-        p_type: type,
-        p_breed: breed,
-        p_age: age,
-        p_weight: weight,
-        p_feed: feed,
-        p_feedConsumption: feedConsumption
+        cattleID: Number(cattleID),
+        type: updatedRecord.type,
+        breed: updatedRecord.breed,
+        age: updatedRecord.age,
+        weight: updatedRecord.weight,
+        feed: updatedRecord.feed,
+        feedConsumption: updatedRecord.feedConsumption,
       },
-      { autoCommit: true }  // Commit after execution
+      { autoCommit: true }
     );
 
-    res.status(200).send({ message: 'Cattle updated successfully' });
-  } catch (error) {
-    console.error('Error updating cattle:', error);
-    res.status(500).send({ message: 'Error updating cattle', error: error.message });
+    console.log('Cattle record updated successfully.');
+  } catch (err) {
+    console.error('Error in model:', err.message);
+    throw err;
   } finally {
     if (connection) {
-      await connection.close();  // Ensure to close the connection
+      await connection.close();
     }
   }
 }

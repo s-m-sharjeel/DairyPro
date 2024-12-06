@@ -23,10 +23,11 @@ async function addCow({ cattleID, breed, age, weight, lactationStatus }) {
     let connection;
     try {
       connection = await getConnection();
-      const result = await connection.execute('SELECT * FROM CATTLE WHERE TYPE = \'COW\'');
+      const result = await connection.execute('SELECT * FROM COW');
       return result.rows.map(row => ({
-        cattleID: row[0],
-        type: row[1],
+        cowID: row[0],
+        cattleID: row[1]
+       // type: row[1],
       }));
     } catch (err) {
       console.error('Error fetching cow:', err);

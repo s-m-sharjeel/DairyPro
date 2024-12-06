@@ -30,16 +30,22 @@ async function getMilkProductionById(req, res) {
 
 async function updateMilkProduction(req, res) {
   const { mpId } = req.params;
+  const updatedRecord = req.body;
   try {
-    await milkModel.updateMilkProduction(mpId, req.body);
+    await milkModel.updateMilkProduction(mpId, updatedRecord);
     res.send('Milk production record updated successfully');
   } catch (err) {
+    console.error('Error in controller:', err.message);
     res.status(500).send('Error updating milk production record');
   }
 }
 
+
 async function deleteMilkProduction(req, res) {
   const { mpId } = req.params;
+  console.log('Request Params:', req.params);
+
+  console.log(mpId);
   try {
     await milkModel.deleteMilkProduction(mpId);
     res.send('Milk production record deleted successfully');

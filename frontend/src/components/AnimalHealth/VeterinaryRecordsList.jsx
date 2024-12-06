@@ -44,7 +44,7 @@ const VeterinaryRecordsList = () => {
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("localhost:3001/api/health");
+      const response = await axios.get("http://localhost:3001/api/health");
       console.log('wow', response);
       setRecords(response.data);
     } catch (error) {
@@ -77,10 +77,11 @@ const VeterinaryRecordsList = () => {
   };
 
   const handleSubmit = async () => {
+    console.log(formData); // Check the formData here to ensure symptoms is populated
     try {
       if (editRecord) {
         // Update existing record
-        await axios.put(`localhost:3001/apo/health/${editRecord.vrid}`, formData);
+        await axios.put(`http://localhost:3001/api/health/${editRecord.vrid}`, formData);
         setRecords((prev) =>
           prev.map((record) =>
             record.vrid === editRecord.vrid ? { ...record, ...formData } : record
@@ -88,7 +89,7 @@ const VeterinaryRecordsList = () => {
         );
       } else {
         // Add new record
-        const response = await axios.post("localhost:3001/apo/health/", formData);
+        const response = await axios.post("http://localhost:3001/api/health/", formData);
         setRecords((prev) => [...prev, response.data]);
       }
       handleCloseDialog();
@@ -96,11 +97,12 @@ const VeterinaryRecordsList = () => {
       console.error("Error saving record:", error);
     }
   };
+  
 
   const deleteRecord = async (vrid) => {
     if (!window.confirm("Are you sure you want to delete this record?")) return;
     try {
-      await axios.delete(`localhost:3001/apo/health/${vrid}`);
+      await axios.delete(`http://localhost:3001/api/health/${vrid}`);
       setRecords((prevRecords) =>
         prevRecords.filter((record) => record.vrid !== vrid)
       );
@@ -111,10 +113,21 @@ const VeterinaryRecordsList = () => {
 
   const filteredRecords = records.filter(
     (record) =>
-      record.cattleID.toString().includes(searchQuery) ||
-      record.vetName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.date.includes(searchQuery)
+      (record.cattleID && record.cattleID.toString().includes(searchQuery)) ||
+      (record.vetName && record.vetName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (record.date && record.date.includes(searchQuery))
   );
+
+  // Function to format date and time
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(); // e.g., 12/05/2024
+  };
+
+  const formatTime = (timeString) => {
+    const time = new Date(timeString);
+    return time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); // e.g., 7:00 PM
+  };
 
   if (loading) {
     return (
@@ -144,14 +157,14 @@ const VeterinaryRecordsList = () => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <Button
+      {/* <Button
         variant="contained"
         color="primary"
         sx={{ marginBottom: 3 }}
         onClick={() => handleOpenDialog()}
       >
-        Add New Record
-      </Button>
+       
+      </Button> */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -170,8 +183,8 @@ const VeterinaryRecordsList = () => {
             {filteredRecords.map((record) => (
               <TableRow key={record.vrid}>
                 <TableCell>{record.cattleID}</TableCell>
-                <TableCell>{record.date}</TableCell>
-                <TableCell>{record.time}</TableCell>
+                <TableCell>{formatDate(record.date)}</TableCell>
+                <TableCell>{formatTime(record.time)}</TableCell>
                 <TableCell>{record.vetName}</TableCell>
                 <TableCell>{record.symptoms}</TableCell>
                 <TableCell>{record.diagnosis}</TableCell>
@@ -275,7 +288,7 @@ const VeterinaryRecordsList = () => {
             Cancel
           </Button>
           <Button onClick={handleSubmit} color="primary">
-            Save
+            {editRecord ? "Save Changes" : "Add Record"}
           </Button>
         </DialogActions>
       </Dialog>

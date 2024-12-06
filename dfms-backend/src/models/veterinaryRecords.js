@@ -1,4 +1,5 @@
 const { getConnection } = require('../db'); // Importing the database connection utility
+const oracledb = require("oracledb");
 
 async function addVeterinaryRecord(cattleID, date, time, symptoms, diagnosis, treatment, vetName) {
   let connection;
@@ -11,6 +12,13 @@ async function addVeterinaryRecord(cattleID, date, time, symptoms, diagnosis, tr
     console.log("Diagnosis:", diagnosis);
     console.log("Treatment:", treatment);
     console.log("VetName:", vetName);
+
+    // Ensure date and time formats are correct
+    const formattedDate = new Date(date).toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    const formattedTime = time; // Assuming it's already in HH:MM:SS format
+
+    console.log("Formatted Date:", formattedDate);
+    console.log("Formatted Time:", formattedTime);
 
     connection = await getConnection();
 
@@ -27,7 +35,7 @@ async function addVeterinaryRecord(cattleID, date, time, symptoms, diagnosis, tr
            :vetName
          ); 
        END;`,
-      { cattleID, date, time, symptoms, diagnosis, treatment, vetName },
+      { cattleID, date: formattedDate, time: formattedTime, symptoms, diagnosis, treatment, vetName },
       { autoCommit: true }
     );
 
@@ -41,6 +49,9 @@ async function addVeterinaryRecord(cattleID, date, time, symptoms, diagnosis, tr
     }
   }
 }
+
+
+
 
 
 
@@ -101,18 +112,68 @@ async function getVeterinaryRecordById(vrid) {
 }
 
 // Function to Update a Veterinary Record (UPDATE)
-async function updateVeterinaryRecord(vrid, cattleID, date, time, vetID, symptoms, diagnosis, treatment) {
+async function updateVeterinaryRecord(vrid, cattleID, date, time, symptoms, diagnosis, treatment, vetName) {
   let connection;
   try {
+    console.log("Updating veterinary record with the following data:");
+    console.log("CattleID:", cattleID);
+    console.log("Date:", date);
+    console.log("Time:", time);
+    console.log("Symptoms:", symptoms);
+    console.log("Diagnosis:", diagnosis);
+    console.log("Treatment:", treatment);
+    console.log("VetName:", vetName);
+
+    // Ensure date is in 'YYYY-MM-DD' format
+    const formattedDate = new Date(date).toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+    // Ensure time is in 'HH:MI:SS' format (without 'T' and 'Z')
+    const formattedTime = new Date(time).toISOString().split('T')[1].slice(0, 8); // 'HH:MI:SS'
+
+    // Combine formatted date and time into 'YYYY-MM-DD HH:MI:SS' format
+    const formattedTimestamp = `${formattedDate} ${formattedTime}`;
+
+    // Log for debugging
+    console.log("Formatted Timestamp:", formattedTimestamp);
+
+    // Establish a connection
     connection = await getConnection();
-    await connection.execute(
-      `BEGIN UpdateVeterinaryRecord(:vrid, :cattleID, :date, :time, :symptoms, :diagnosis, :treatment,  :vetName); END;`,
-      { vrid, cattleID, date, time, vetID, symptoms, diagnosis, treatment, vetName },
+
+    // Execute the update procedure
+    const result = await connection.execute(
+      `BEGIN 
+         UpdateVeterinaryRecord(
+           :vrid, 
+           :cattleID, 
+           TO_DATE(:date, 'YYYY-MM-DD'), 
+           TO_TIMESTAMP(:time, 'YYYY-MM-DD HH24:MI:SS'), 
+           :symptoms, 
+           :diagnosis, 
+           :treatment, 
+           :vetName
+         ); 
+       END;`,
+      { 
+        vrid, 
+        cattleID, 
+        date: formattedDate,  // 'YYYY-MM-DD'
+        time: formattedTimestamp,  // 'YYYY-MM-DD HH:MI:SS'
+        symptoms, 
+        diagnosis, 
+        treatment, 
+        vetName 
+      },
       { autoCommit: true }
     );
+
+    // The autoCommit should automatically handle committing the transaction, so no need to call commit explicitly.
+    console.log("Record updated successfully:", result);
+
+    //res.send('Veterinary record updated successfully');
+    
   } catch (err) {
     console.error('Error updating veterinary record:', err);
-    throw err;
+    res.status(500).send('Error updating veterinary record');
   } finally {
     if (connection) {
       await connection.close();
@@ -120,16 +181,23 @@ async function updateVeterinaryRecord(vrid, cattleID, date, time, vetID, symptom
   }
 }
 
+
+
+
 // Function to Delete a Veterinary Record (DELETE)
 async function deleteVeterinaryRecord(vrid) {
   let connection;
   try {
+    console.log('vrid: ', vrid);
     connection = await getConnection();
     await connection.execute(
       `BEGIN DeleteVeterinaryRecord(:vrid); END;`,
-      { vrid },
+      {
+        vrid: vrid // Bind the cattleID to the procedure
+      },
       { autoCommit: true }
-    );
+    );  // Remove autoCommit: true here
+    await connection.commit();  // Explicitly commit the transaction
   } catch (err) {
     console.error('Error deleting veterinary record:', err);
     throw err;

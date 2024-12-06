@@ -113,4 +113,14 @@ export const deleteMilkProduction = async (recordID) => {
   }
 };
 
+export const getAllCows = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/cow`); // Assuming the endpoint for cows is '/api/cows'
+    return response.data; // Data returned from the backend (array of cows)
+  } catch (error) {
+    console.error("Error fetching all cows:", error);
+    throw error;
+  }
+};
+
 export default axios;

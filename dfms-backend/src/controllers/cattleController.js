@@ -41,15 +41,30 @@ async function getCattleById(req, res) {
 }
 
 // PUT request handler for updating cattle (UPDATE)
+// PUT request handler for updating cattle (UPDATE)
 async function updateCattle(req, res) {
-  const { id } = req.params;
-  const { type, breed, age, weight, feed, feedConsumption } = req.body;
+  
+  const { cattleID } = req.params; // Get cattleID from the URL parameters
+  const updatedData = req.body; // Get data from request body
+  console.log(cattleID);
+  // Validate that cattleID is present in the URL parameters
+  if (!cattleID) {
+    return res.status(400).send({ message: 'CattleID is required' });
+  }
+
+  // Check if all necessary fields are provided in the body
+  if (!updatedData.type || !updatedData.breed || !updatedData.age || !updatedData.weight || !updatedData.feed || !updatedData.feedConsumption) {
+    return res.status(400).send({ message: 'All fields are required' });
+  }
+
   try {
-    await cattleModel.updateCattle(id, type, breed, age, weight, feed, feedConsumption);
-    res.send('Cattle updated successfully');
-  } catch (err) {
-    console.error('Error updating cattle:', err);
-    res.status(500).send('Error updating cattle');
+    // Call the function to update cattle record
+    await cattleModel.updateCattle(cattleID, updatedData);
+
+    res.status(200).send({ message: 'Cattle updated successfully' });
+  } catch (error) {
+    console.error('Error updating cattle:', error);
+    res.status(500).send({ message: 'Error updating cattle', error: error.message });
   }
 }
 
