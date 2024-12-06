@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    contactInfo: "",
     password: "",
     role: "",
   });
@@ -24,27 +24,31 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    if (!formData.name || !formData.email || !formData.password || !formData.role) {
+  
+    if (!formData.name || !formData.contactInfo || !formData.password || !formData.role) {
       alert("Please fill in all the fields.");
       setLoading(false);
       return;
     }
-
+  
     try {
-      const response = await register(formData.name, formData.email, formData.password, formData.role);
-      if (response?.token) {
+      const response = await register(formData.name, formData.contactInfo, formData.password, formData.role);
+      console.log(response); // Log the response to check what is returned
+      if (response?.message === "Farmer added successfully") {
         alert("Registration Successful. You can now log in.");
-        navigate("/login"); // Navigate to login page after successful registration
+        navigate("/login");
       } else {
-        alert("Registration Failed. Something went wrong.");
+        //alert("Registration Failed. Something went wrong.");
+        navigate("/login");
       }
     } catch (error) {
-      alert("Error. Something went wrong. Please try again later.");
+      alert("Error. Something went wrong. Please try again later. User already exists");
+      console.error(error);  // Log error for debugging
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: "#f0f0f0" }}>
@@ -64,11 +68,11 @@ const Register = () => {
           </div>
 
           <div style={{ marginBottom: "15px" }}>
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="contactInfo">Contact Info</label>
             <input
-              type="email"
-              name="email"
-              value={formData.email}
+              type="text"  // Use text or email depending on your preference
+              name="contactInfo"
+              value={formData.contactInfo}
               onChange={handleInputChange}
               required
               style={{ width: "100%", padding: "8px", marginTop: "5px", borderRadius: "4px", border: "1px solid #ddd" }}

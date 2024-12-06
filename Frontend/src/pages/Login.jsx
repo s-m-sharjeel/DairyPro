@@ -10,22 +10,29 @@ const Login = () => {
   const navigate = useNavigate();
   const { user, login } = useAuth();
 
+  // Redirect if user is already authenticated
   useEffect(() => {
     if (user?.isAuthenticated) {
       navigate('/home');
     }
   }, [user, navigate]);
 
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle form submission for login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError(''); // Reset error state before each login attempt
   
+    // Log form data before submitting
+    console.log('Form Data:', formData);
+  
+    // Validate form inputs
     if (!formData.email || !formData.password) {
       setError('Please enter both email and password.');
       setLoading(false);
@@ -33,12 +40,16 @@ const Login = () => {
     }
   
     try {
-      await login(formData);
-      navigate('/home'); // Navigate to home on successful login
-    } catch (error) {
-      setError(error.message); // Display error from API
+      const credentials = {
+        contactInfo: formData.email, // Change 'email' to 'contactInfo' to match backend
+        password: formData.password,
+      };
+      await login(credentials); // Call login from AuthContext
+      navigate('/home'); // Navigate to home page on successful login
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.'); // Handle error from login
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading indicator
     }
   };
   
@@ -65,7 +76,9 @@ const Login = () => {
         <Typography variant="h5" sx={{ textAlign: 'center', marginBottom: '20px' }}>
           Login
         </Typography>
+
         {error && <Typography color="error" sx={{ marginBottom: '10px' }}>{error}</Typography>}
+
         <form onSubmit={handleSubmit}>
           <TextField
             label="Email Address"
@@ -100,11 +113,6 @@ const Login = () => {
       </Box>
     </Box>
   );
-
-
-  
 };
-
-
 
 export default Login;

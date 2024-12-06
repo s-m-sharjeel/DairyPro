@@ -123,4 +123,33 @@ export const getAllCows = async () => {
   }
 };
 
+export const updatePassword = async ({ currentPassword, newPassword }, farmerID) => {
+  //const farmerID = localStorage.getItem("farmerID");
+  console.log('eche: ', farmerID);  // Ensure farmerID is logged correctly
+  //console.log(localStorage.getItem("farmerID"));
+
+  if (!farmerID) {
+    throw new Error("Farmer ID is missing.");
+  }
+
+  try {
+    const response = await axios.post(`${BASE_URL}/api/farmer/${farmerID}/password`, {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating password:", error.response || error);
+    throw error;
+  }
+};
+
+// Add this function in the api.js file
+export const updateUserSettings = async (formData, farmerID) => {
+  console.log(farmerID);
+  const response = await axios.put(`${BASE_URL}/api/farmer/${farmerID}`, formData);
+  return response.data;
+};
+
+
 export default axios;

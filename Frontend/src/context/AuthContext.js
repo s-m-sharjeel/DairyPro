@@ -33,7 +33,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const { data } = await axios.post('http://localhost:3001/api/farmer/login', credentials); // Updated URL
+      console.log('Sending credentials:', credentials); // Log credentials for debugging
+      const { data } = await axios.post('http://localhost:3001/api/farmer/login', credentials);
       if (data.success) {
         const newUser = { isAuthenticated: true, ...data.farmer };
         setUser(newUser);
@@ -47,6 +48,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
   
+
+  const register = async (name, contactInfo, password, role) => {
+    try {
+      const response = await axios.post('http://localhost:3001/api/farmer/register', {
+        name,
+        contactInfo,  // Make sure to send contactInfo instead of email
+        password,
+        role
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw new Error('Registration failed');
+    }
+  };
+
   useEffect(() => {
     const activityEvents = ['mousemove', 'keydown', 'click'];
 
@@ -68,7 +85,7 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, register }}>  {/* Provide register function */}
       {children}
     </AuthContext.Provider>
   );

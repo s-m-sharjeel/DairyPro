@@ -1,11 +1,13 @@
 const farmerModel = require('../models/farmer');
 
 async function addFarmer(req, res) {
+  const { name, contactInfo, role, password } = req.body;
+
   try {
-    await farmerModel.addFarmer(req.body);
+    await farmerModel.addFarmer({ name, contactInfo, role, password });
     res.status(201).send('Farmer added successfully');
   } catch (err) {
-    res.status(500).send('Error adding farmer');
+    res.status(500).send(err.message || 'Error adding farmer');
   }
 }
 
@@ -18,55 +20,73 @@ async function getAllFarmers(req, res) {
   }
 }
 
-async function getFarmerById(req, res) {
-  const { farmerID } = req.params;
-  try {
-    const farmer = await farmerModel.getFarmerById(farmerID);
-    res.json(farmer);
-  } catch (err) {
-    res.status(404).send('Farmers not found');
-  }
-}
-
 async function updateFarmer(req, res) {
   const { farmerID } = req.params;
+
   try {
     await farmerModel.updateFarmer(farmerID, req.body);
     res.send('Farmer updated successfully');
   } catch (err) {
-    res.status(500).send('Error updating farmer');
-  }
-}
-
-async function checkFarmerLogin(req, res) {
-  const { email, password } = req.body;
-  try {
-    const farmer = await farmerModel.checkFarmerLogin(email, password);
-    if (farmer) {
-      res.status(200).json({ success: true, farmer }); // Ensure response format is correct
-    } else {
-      res.status(401).send('Invalid login credentials');
-    }
-  } catch (err) {
-    res.status(500).send('Error logging in farmer');
+    res.status(500).send(err.message || 'Error updating farmer');
   }
 }
 
 async function deleteFarmer(req, res) {
   const { farmerID } = req.params;
+
   try {
     await farmerModel.deleteFarmer(farmerID);
     res.send('Farmer deleted successfully');
   } catch (err) {
-    res.status(500).send('Error deleting farmer');
+    res.status(500).send(err.message || 'Error deleting farmer');
   }
 }
+
+async function checkFarmerLogin(req, res) {
+  const { contactInfo, password } = req.body;
+
+  try {
+    const farmer = await farmerModel.checkFarmerLogin(contactInfo, password);
+    if (!farmer) return res.status(401).send('Invalid login credentials');
+
+    res.status(200).json({ success: true, farmer });
+  } catch (err) {
+    res.status(500).send(err.message || 'Error logging in farmer');
+  }
+}
+
+async function updateFarmerPassword(req, res) {
+  const { farmerID } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    await farmerModel.updateFarmerPassword(farmerID, currentPassword, newPassword);
+    res.send('Password updated successfully');
+  } catch (err) {
+    res.status(500).send(err.message || 'Error updating password');
+  }
+}
+
+async function updateFarmerSettings(req, res) {
+  const { farmerID } = req.params;
+  const settings = req.body; // Expect settings as an object
+
+  try {
+    await farmerModel.updateFarmerSettings(farmerID, settings);
+    res.send('Farmer settings updated successfully');
+  } catch (err) {
+    res.status(500).send(err.message || 'Error updating farmer settings');
+  }
+}
+
+
 
 module.exports = {
   addFarmer,
   getAllFarmers,
-  //getFarmerById,
-  checkFarmerLogin,
   updateFarmer,
-  deleteFarmer
+  updateFarmerSettings,
+  deleteFarmer,
+  checkFarmerLogin,
+  updateFarmerPassword,
 };
