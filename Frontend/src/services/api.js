@@ -133,7 +133,7 @@ export const updatePassword = async ({ currentPassword, newPassword }, farmerID)
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/farmer/${farmerID}/password`, {
+    const response = await axios.put(`http://localhost:3001/api/farmer/${farmerID}/password`, {
       currentPassword,
       newPassword,
     });
