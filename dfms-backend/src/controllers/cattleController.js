@@ -2,13 +2,11 @@
 const cattleModel = require('../models/cattle'); // Import the model
 
 // POST request handler for adding cattle (CREATE)
-// POST request handler for adding cattle (CREATE)
 async function addCattle(req, res) {
-  const { type, breed, age, weight, feed, feedConsumption } = req.body;
-  console.log('Hello');
+  const { type, breed, age, weight, feed, feedConsumption, lactationStatus } = req.body;
   try {
     // Assuming cattleModel.addCattle is a function that handles adding a new cattle
-    await cattleModel.addCattle(type, breed, age, weight, feed, feedConsumption);  
+    await cattleModel.addCattle(type, breed, age, weight, feed, feedConsumption, lactationStatus);  
     res.status(201).send('Cattle added successfully');
   } catch (err) {
     console.error('Error adding cattle:', err);

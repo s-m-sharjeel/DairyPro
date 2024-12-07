@@ -16,6 +16,7 @@ app.use(cors({
 }));
 
 // Import route files
+const feedRoutes = require('./routes/feed');
 const cattleRoutes = require('./routes/cattle');
 const breedingRoutes = require('./routes/breedingRecords');
 const milkProductionRoutes = require('./routes/milkProduction');
@@ -25,7 +26,9 @@ const cowRoutes = require('./routes/cow');
 const offspringRoutes = require('./routes/offspring');
 const veterinaryRoutes = require('./routes/veterinaryRoutes');
 
+
 // Use routes
+app.use('/api/feed', feedRoutes);
 app.use('/api/cattle', cattleRoutes);
 app.use('/api/breedingrecords', breedingRoutes);
 app.use('/api/milkproduction', milkProductionRoutes);

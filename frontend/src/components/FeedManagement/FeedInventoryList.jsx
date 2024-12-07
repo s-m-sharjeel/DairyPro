@@ -12,26 +12,86 @@ import {
   Button,
   Typography,
   IconButton,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogActions,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import DeleteIcon from "@mui/icons-material/Delete"; // For delete icon
+import EditIcon from "@mui/icons-material/Edit";  // For edit icon
 
-const FeedInventoryList = () => {
+const FeedList = () => {
   const [feedData, setFeedData] = useState([]);
   const [searchType, setSearchType] = useState("");
   const [loading, setLoading] = useState(false);
-  const [editingFeed, setEditingFeed] = useState(null);
-  const [newFeedData, setNewFeedData] = useState({ quantity: "", cost: "" });
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);  // For edit form
+  const [selectedFeedID, setSelectedFeedID] = useState(null);
+  const [editFeed, setEditFeed] = useState({
+    type: "",
+    quantity: "",
+    supplier: "",
+    cost: "",
+  });
 
-  // Fetch feed inventory data
+  // Fetch feed records from API
   const fetchFeedData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/feedInventory");
+      const response = await axios.get("http://localhost:3001/api/feed"); // Replace with your API endpoint
       setFeedData(response.data);
     } catch (error) {
-      console.error("Error fetching feed inventory data:", error);
+      console.error("Error fetching feed data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle Edit button click
+  const handleEditFeed = (feed) => {
+    setEditFeed({
+      type: feed.type,
+      quantity: feed.quantity,
+      supplier: feed.supplier,
+      cost: feed.cost
+    });
+    setSelectedFeedID(feed.feedID);
+    setOpenEditDialog(true);
+  };
+
+  const handleUpdateFeed = async () => {
+    try {
+      await axios.put(`http://localhost:3001/api/feed/${selectedFeedID}`, editFeed);
+      fetchFeedData();  // Refresh the cattle data after the update
+      setOpenEditDialog(false); // Close the edit dialog
+    } catch (error) {
+      console.error("Error updating feed:", error);
+    }
+  };
+
+  // Filter cattle records by type or breed
+  const handleSearch = () => {
+    if (!searchType) {
+      fetchFeedData();
+      return;
+    }
+
+    const filteredData = feedData.filter(
+      (record) =>
+        record.type.toLowerCase().includes(searchType.toLowerCase()) ||
+        record.breed.toLowerCase().includes(searchType.toLowerCase())
+    );
+    setFeedData(filteredData);
+  };
+
+  // Handle Delete button click
+  const handleDeleteFeed = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/api/feed/${selectedFeedID}`);
+      fetchFeedData(); // Refresh the feed data after deletion
+      setOpenDialog(false); // Close the delete confirmation dialog
+    } catch (error) {
+      console.error("Error deleting feed:", error);
     }
   };
 
@@ -39,49 +99,15 @@ const FeedInventoryList = () => {
     fetchFeedData();
   }, []);
 
-  // Filter records by feed type
-  const handleSearch = () => {
-    if (!searchType) {
-      fetchFeedData();
-      return;
-    }
-
-    const filteredData = feedData.filter((feed) =>
-      feed.type.toLowerCase().includes(searchType.toLowerCase())
-    );
-    setFeedData(filteredData);
-  };
-
-  // Handle update
-  const handleUpdate = async (feedId) => {
-    try {
-      await axios.put(`/api/feedInventory/${feedId}`, newFeedData);
-      fetchFeedData();
-      setEditingFeed(null);
-    } catch (error) {
-      console.error("Error updating feed inventory:", error);
-    }
-  };
-
-  // Handle delete
-  const handleDelete = async (feedId) => {
-    try {
-      await axios.delete(`/api/feedInventory/${feedId}`);
-      fetchFeedData();
-    } catch (error) {
-      console.error("Error deleting feed record:", error);
-    }
-  };
-
   return (
     <div style={{ padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
-        Feed Inventory
+        Feed Records
       </Typography>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
         <TextField
-          label="Search by Feed Type"
+          label="Search by Type or Supplier"
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
           variant="outlined"
@@ -103,7 +129,7 @@ const FeedInventoryList = () => {
               <TableCell align="center">Type</TableCell>
               <TableCell align="center">Quantity (kg)</TableCell>
               <TableCell align="center">Supplier</TableCell>
-              <TableCell align="center">Cost ($)</TableCell>
+              <TableCell align="center">Cost (per kg)</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -115,80 +141,31 @@ const FeedInventoryList = () => {
                 </TableCell>
               </TableRow>
             ) : feedData.length > 0 ? (
-              feedData.map((feed) => (
-                <TableRow key={feed.FeedID}>
-                  <TableCell align="center">{feed.FeedID}</TableCell>
-                  <TableCell align="center">{feed.type}</TableCell>
+              feedData.map((record) => (
+                <TableRow key={record.FeedID}>
+                  <TableCell align="center">{record.feedID}</TableCell>
+                  <TableCell align="center">{record.type}</TableCell>
+                  <TableCell align="center">{record.quantity}</TableCell>
+                  <TableCell align="center">{record.supplier}</TableCell>
+                  <TableCell align="center">{record.cost}</TableCell>
                   <TableCell align="center">
-                    {editingFeed === feed.FeedID ? (
-                      <TextField
-                        size="small"
-                        value={newFeedData.quantity}
-                        onChange={(e) =>
-                          setNewFeedData((prev) => ({
-                            ...prev,
-                            quantity: e.target.value,
-                          }))
-                        }
-                      />
-                    ) : (
-                      feed.quantity
-                    )}
-                  </TableCell>
-                  <TableCell align="center">{feed.supplier}</TableCell>
-                  <TableCell align="center">
-                    {editingFeed === feed.FeedID ? (
-                      <TextField
-                        size="small"
-                        value={newFeedData.cost}
-                        onChange={(e) =>
-                          setNewFeedData((prev) => ({
-                            ...prev,
-                            cost: e.target.value,
-                          }))
-                        }
-                      />
-                    ) : (
-                      feed.cost
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    {editingFeed === feed.FeedID ? (
-                      <>
-                        <Button
-                          onClick={() => handleUpdate(feed.FeedID)}
-                          color="primary"
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          onClick={() => setEditingFeed(null)}
-                          color="secondary"
-                        >
-                          Cancel
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <IconButton
-                          onClick={() => {
-                            setEditingFeed(feed.FeedID);
-                            setNewFeedData({
-                              quantity: feed.quantity,
-                              cost: feed.cost,
-                            });
-                          }}
-                        >
-                          <Edit />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleDelete(feed.FeedID)}
-                          color="error"
-                        >
-                          <Delete />
-                        </IconButton>
-                      </>
-                    )}
+                    {/* Edit Button */}
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditFeed(record)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    {/* Delete Button */}
+                    <IconButton
+                      color="secondary"
+                      onClick={() => {
+                        setSelectedFeedID(record.feedID);
+                        setOpenDialog(true);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
@@ -202,8 +179,72 @@ const FeedInventoryList = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Edit Feed Dialog */}
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <DialogTitle>Edit Feed</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Type"
+            fullWidth
+            value={editFeed.type}
+            onChange={(e) => setEditFeed({ ...editFeed, type: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Quantity"
+            fullWidth
+            value={editFeed.breed}
+            onChange={(e) => setEditFeed({ ...editFeed, quantity: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Supplier"
+            type="number"
+            fullWidth
+            value={editFeed.supplier}
+            onChange={(e) => setEditFeed({ ...editFeed, age: e.target.value })}
+            margin="dense"
+          />
+          <TextField
+            label="Cost"
+            type="number"
+            fullWidth
+            value={editFeed.cost}
+            onChange={(e) => setEditFeed({ ...editFeed, weight: e.target.value })}
+            margin="dense"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleUpdateFeed} color="primary">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Delete Feed</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this feed record?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteFeed}
+            color="secondary"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
 
-export default FeedInventoryList;
+export default FeedList;

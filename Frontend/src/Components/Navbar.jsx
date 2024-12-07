@@ -42,12 +42,12 @@ const Navbar = () => {
     <AppBar position="sticky" sx={{ backgroundColor: '#1976d2' }}>
       <Toolbar>
         {/* Left side menu icon */}
-        <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+        <IconButton component={Link} to="/dashboard" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
           <MenuIcon />
         </IconButton>
 
         {/* App name */}
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography component={Link} to="/home" variant="h6" sx={{ flexGrow: 1 }}>
           DairyPro
         </Typography>
 
@@ -99,7 +99,7 @@ const Navbar = () => {
                 onClick={handleMenuOpen}
                 sx={{ marginRight: 2 }}
               >
-                {user?.username}
+                {user?.name}
               </Button>
 
               {/* Dropdown menu */}
