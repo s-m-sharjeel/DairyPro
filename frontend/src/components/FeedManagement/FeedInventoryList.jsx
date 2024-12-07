@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -82,6 +83,7 @@ const FeedList = () => {
         record.breed.toLowerCase().includes(searchType.toLowerCase())
     );
     setFeedData(filteredData);
+    
   };
 
   // Handle Delete button click
@@ -118,6 +120,9 @@ const FeedList = () => {
         </Button>
         <Button variant="outlined" color="secondary" onClick={fetchFeedData}>
           Reset
+        </Button>
+        <Button component={Link} to="/add-feed-inventory" variant="contained" color="primary">
+          Add
         </Button>
       </div>
 

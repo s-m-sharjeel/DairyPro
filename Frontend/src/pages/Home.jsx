@@ -18,7 +18,7 @@ const Home = () => {
       <Typography variant="h5" sx={{ marginBottom: 4, color: '#555' }}>Manage your cattle efficiently with our comprehensive tracking system.</Typography>
       <Grid container spacing={4} justifyContent="center">
         <Grid item xs={12} sm={6} md={3}>
-          <Button component={Link} to="/dashboard" variant="contained" fullWidth sx={{ backgroundColor: '#1976d2', color: 'white', '&:hover': { backgroundColor: '#1565c0' }, boxShadow: 3 }}>Go to Dashboard</Button>
+          <Button component={Link} to="/cattle-list" variant="contained" fullWidth sx={{ backgroundColor: '#1976d2', color: 'white', '&:hover': { backgroundColor: '#1565c0' }, boxShadow: 3 }}>Cattle Management</Button>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Button component={Link} to="/milk-production" variant="contained" fullWidth sx={{ backgroundColor: '#388e3c', color: 'white', '&:hover': { backgroundColor: '#2c6e29' }, boxShadow: 3 }}>Milk Production</Button>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -17,6 +18,8 @@ const AddFeedInventory = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = async (event) => {
@@ -38,12 +41,14 @@ const AddFeedInventory = () => {
     };
 
     try {
-      await axios.post("/api/feed-inventory", newFeedInventory); // Replace with actual endpoint
+      await axios.post("http://localhost:3001/api/feed", newFeedInventory); // Replace with actual endpoint
       setSuccess(true);
       setFeedType("");
       setQuantity("");
       setSupplier("");
       setCost("");
+      // Redirect after success
+      setTimeout(() => navigate('/feed-inventory'), 1000);
     } catch (err) {
       setError("Error adding feed inventory.");
     } finally {

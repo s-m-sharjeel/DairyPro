@@ -37,13 +37,13 @@ const AddCattle = () => {
     }
 
     try {
-      const response = await addCattle(cattleData); // Use the API function to post data
+      await addCattle(cattleData); // Use the API function to post data
 
       // If the request is successful, show a success message
       setSuccess(true);
 
       // Redirect after success
-      setTimeout(() => navigate('/cattle-list'), 2000);
+      setTimeout(() => navigate('/cattle-list'), 1000);
     } catch (err) {
       console.error('Error adding cattle:', err.message);
       setError("Failed to add cattle.");

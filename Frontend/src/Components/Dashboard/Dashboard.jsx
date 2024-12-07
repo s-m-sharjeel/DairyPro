@@ -14,8 +14,26 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get("/dashboard-data");
-        setDashboardData(response.data);
+        // Fetch all data concurrently
+        const [
+          totalMilkResponse,
+          averageQualityResponse,
+          healthAlertsResponse,
+          feedInventoryResponse,
+        ] = await Promise.all([
+          axios.get("http://localhost:3001/api/dashboard/totalMilk"),
+          axios.get("http://localhost:3001/api/dashboard/averageQuality"),
+          axios.get("http://localhost:3001/api/dashboard/healthAlerts"),
+          axios.get("http://localhost:3001/api/dashboard/feedInventoryStatus"),
+        ]);
+
+        // Update the dashboard data with API responses
+        setDashboardData({
+          totalMilkProduced: totalMilkResponse.data.totalMilkProduced || 0,
+          averageQuality: averageQualityResponse.data.averageQuality || 0,
+          healthAlerts: healthAlertsResponse.data.healthAlerts || 0,
+          feedInventoryStatus: feedInventoryResponse.data.feedInventoryStatus || 0,
+        });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
@@ -24,7 +42,7 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, []); // Empty dependency array ensures it runs only once on component mount
 
   if (loading) {
     return (

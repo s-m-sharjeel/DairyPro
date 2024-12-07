@@ -16,6 +16,8 @@ app.use(cors({
 }));
 
 // Import route files
+
+const dashboardRoutes = require('./routes/dashboard');
 const feedRoutes = require('./routes/feed');
 const cattleRoutes = require('./routes/cattle');
 const breedingRoutes = require('./routes/breedingRecords');
@@ -25,7 +27,6 @@ const bullRoutes = require('./routes/bull');
 const cowRoutes = require('./routes/cow');
 const offspringRoutes = require('./routes/offspring');
 const veterinaryRoutes = require('./routes/veterinaryRoutes');
-
 
 // Use routes
 app.use('/api/feed', feedRoutes);
@@ -37,6 +38,8 @@ app.use('/api/bull', bullRoutes);
 app.use('/api/cow', cowRoutes);
 app.use('/api/offspring', offspringRoutes);
 app.use('/api/health', veterinaryRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
