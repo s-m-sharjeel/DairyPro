@@ -12,6 +12,7 @@ import MilkProductionList from './Components/MilkProduction/MilkProductionList';
 import AddMilkProduction from './Components/MilkProduction/AddMilkProduction';
 import AddBreedingRecord from './Components/BreedingManagement/AddBreedingRecord';
 import AddOffspringRecord from './Components/BreedingManagement/AddOffspringRecord';
+import BreedingRecordList from './Components/BreedingManagement/BreedingRecordsList';
 import VeterinaryRecordsList from './Components/AnimalHealth/VeterinaryRecordsList';
 import AddVeterinaryRecord from './Components/AnimalHealth/AddVeterinaryRecord';
 import FeedInventoryList from './Components/FeedManagement/FeedInventoryList';
@@ -69,6 +70,7 @@ const App = () => {
                   <Route path="/milk-production" element={<AuthWrapper><MilkProductionList /></AuthWrapper>} />
                   <Route path="/add-milk-production" element={<AuthWrapper><AddMilkProduction /></AuthWrapper>} />
                   <Route path="/add-breeding-record" element={<AuthWrapper><AddBreedingRecord /></AuthWrapper>} />
+                  <Route path="/breeding-records" element={<AuthWrapper><BreedingRecordList /></AuthWrapper>} />
                   <Route path="/add-offspring" element={<AuthWrapper><AddOffspringRecord /></AuthWrapper>} />
                   <Route path="/veterinary-records" element={<AuthWrapper><VeterinaryRecordsList /></AuthWrapper>} />
                   <Route path="/add-veterinary-record" element={<AuthWrapper><AddVeterinaryRecord /></AuthWrapper>} />

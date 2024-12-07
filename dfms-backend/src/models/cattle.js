@@ -17,7 +17,7 @@ async function addCattle(type, breed, age, weight, feed, feedConsumption, lactat
         breed: breed,
         age: age,
         weight: weight,
-        feed: parseInt(feed, 10),  // Ensure feed is passed as an integer
+        feed: feed,  // Ensure feed is passed as an integer
         feedConsumption: feedConsumption,
         lactationStatus: lactationStatus
       },
@@ -47,7 +47,7 @@ async function getAllCattle() {
   let connection;
   try {
     connection = await getConnection();
-    const result = await connection.execute('SELECT * FROM CATTLE');
+    const result = await connection.execute('SELECT CattleID, c.Type, Breed, Age, Weight, f.Type, FeedConsumption FROM CATTLE c JOIN FEED f ON c.FeedID = f.FeedID ORDER BY CattleID');
     return result.rows.map(row => ({
       cattleID: row[0],
       type: row[1],
@@ -96,28 +96,6 @@ async function getCattleById(cattleID) {
   }
 }
 
-// Function to Update Cattle (UPDATE)
-// async function updateCattle(cattleID, type, breed, age, weight, feed, feedConsumption) {
-//   let connection;
-//   try {
-//     connection = await getConnection();
-//     await connection.execute(
-//       `UPDATE Cattle
-//        SET Type = :type, Breed = :breed, Age = :age, Weight = :weight, FeedID = :feed, FeedConsumption = :feedConsumption
-//        WHERE CattleID = :cattleID`,
-//       { cattleID, type, breed, age, weight, feed, feedConsumption },
-//       { autoCommit: true }
-//     );
-//   } catch (err) {
-//     console.error('Error updating cattle:', err);
-//     throw err;
-//   } finally {
-//     if (connection) {
-//       await connection.close();
-//     }
-//   }
-// }
-
 async function updateCattle(cattleID, updatedData) {
   let connection;
   try {
@@ -145,18 +123,9 @@ async function updateCattle(cattleID, updatedData) {
     // Update the record in the database
     connection = await getConnection();
     await connection.execute(
-      `BEGIN UpdateCattle(
-        :cattleID,
-        :type,
-        :breed,
-        :age,
-        :weight,
-        :feed,
-        :feedConsumption
-      ); END;`,
+      "BEGIN UpdateCattle(:cattleID, :breed, :age, :weight, :feed, :feedConsumption); END;",
       {
         cattleID: Number(cattleID),
-        type: updatedRecord.type,
         breed: updatedRecord.breed,
         age: updatedRecord.age,
         weight: updatedRecord.weight,

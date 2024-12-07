@@ -17,6 +17,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import { Link } from 'react-router-dom';
 import DeleteIcon from "@mui/icons-material/Delete";  // For delete icon
 import EditIcon from "@mui/icons-material/Edit";  // For edit icon
 
@@ -52,7 +53,6 @@ const CattleList = () => {
   // Handle Edit button click
   const handleEditCattle = (cattle) => {
     setEditCattle({
-      type: cattle.type,
       breed: cattle.breed,
       age: cattle.age,
       weight: cattle.weight,
@@ -124,6 +124,9 @@ const CattleList = () => {
         <Button variant="outlined" color="secondary" onClick={fetchCattleData}>
           Reset
         </Button>
+        <Button component={Link} to="/add-cattle" variant="contained" color="primary">
+          Add
+        </Button>
       </div>
 
       <TableContainer component={Paper}>
@@ -135,6 +138,7 @@ const CattleList = () => {
               <TableCell align="center">Breed</TableCell>
               <TableCell align="center">Age</TableCell>
               <TableCell align="center">Weight</TableCell>
+              <TableCell align="center">Feed</TableCell>
               <TableCell align="center">Feed Consumption (kg)</TableCell>
               <TableCell align="center">Actions</TableCell> {/* For Edit and Delete buttons */}
             </TableRow>
@@ -154,6 +158,7 @@ const CattleList = () => {
                   <TableCell align="center">{record.breed}</TableCell>
                   <TableCell align="center">{record.age}</TableCell>
                   <TableCell align="center">{record.weight}</TableCell>
+                  <TableCell align="center">{record.feed}</TableCell>
                   <TableCell align="center">{record.feedConsumption || 'N/A'}</TableCell>
                   <TableCell align="center">
                     {/* Edit Button */}
@@ -192,13 +197,6 @@ const CattleList = () => {
         <DialogTitle>Edit Cattle</DialogTitle>
         <DialogContent>
           <TextField
-            label="Type"
-            fullWidth
-            value={editCattle.type}
-            onChange={(e) => setEditCattle({ ...editCattle, type: e.target.value })}
-            margin="dense"
-          />
-          <TextField
             label="Breed"
             fullWidth
             value={editCattle.breed}
@@ -223,7 +221,6 @@ const CattleList = () => {
           />
           <TextField
             label="Feed"
-            type="number"
             fullWidth
             value={editCattle.feed}
             onChange={(e) => setEditCattle({ ...editCattle, feed: e.target.value })}

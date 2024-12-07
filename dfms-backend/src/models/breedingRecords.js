@@ -6,8 +6,7 @@ async function addBreedingRecord({ cowID, bullID, offspringID, date }) {
     try {
       connection = await getConnection();
       const result = await connection.execute(
-        `INSERT INTO BreedingRecords (BRID, CowID, BullID, OffspringID, "Date") 
-        VALUES (BreedingRecords_Seq.NEXTVAL, :cowID, :bullID, :offspringID, :date)`,
+        `BEGIN AddBreedingRecord(:cowID, :bullID, :offspringID, :date); END`,
         [cowID, bullID, offspringID, date],
         { autoCommit: true }
       );
@@ -28,14 +27,20 @@ async function getBreedingRecords() {
   let connection;
   try {
     connection = await getConnection();
-    const result = await connection.execute('SELECT * FROM BreedingRecords');
-    return result.rows.map(row => ({
-      brId: row[0],
-      cowId: row[1],
-      bullId: row[2],
-      offspringId: row[3],
-      date: row[4]
-    }));
+    const result = await connection.execute('SELECT * FROM BreedingRecords ORDER BY BRID');
+
+    return result.rows.map(row => {
+      const formattedDate = new Date(row[4]).toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+
+      return {
+        BRID: row[0],
+        cowID: row[1],
+        bullID: row[2],
+        offspringID: row[3],
+        date: formattedDate
+      };
+    });
+
   } catch (err) {
     console.error('Error fetching breeding records:', err);
     throw err;
@@ -56,10 +61,10 @@ async function getBreedingRecordById(brId) {
     if (result.rows.length === 0) throw new Error('Breeding record not found');
     const row = result.rows[0];
     return {
-      brId: row[0],
-      cowId: row[1],
-      bullId: row[2],
-      offspringId: row[3],
+      BRID: row[0],
+      cowID: row[1],
+      bullID: row[2],
+      offspringID: row[3],
       date: row[4]
     };
   } catch (err) {
@@ -76,9 +81,7 @@ async function updateBreedingRecord(brId, { cowID, bullID, offspringID, date }) 
   try {
     connection = await getConnection();
     await connection.execute(
-      `UPDATE BreedingRecords 
-       SET CowID = :cowID, BullID = :bullID, OffspringID = :offspringID, Date = :date
-       WHERE BRID = :brId`,
+      `BEGIN UpdateBreedingRecord(:brId, :cowID, :bullID, :offspringID, :date); END;`,
       [cowID, bullID, offspringID, date, brId],
       { autoCommit: true }
     );
@@ -96,7 +99,7 @@ async function deleteBreedingRecord(brId) {
   try {
     connection = await getConnection();
     await connection.execute(
-      `DELETE FROM BreedingRecords WHERE BRID = :brId`,
+      `BEGIN DeleteBreedingRecord(:brId); END;`,
       [brId],
       { autoCommit: true }
     );

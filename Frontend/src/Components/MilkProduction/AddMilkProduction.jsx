@@ -101,13 +101,13 @@ const AddMilkProduction = () => {
     };
   
     try {
-      const response = await addMilkProduction(formattedData); // Use the API function to post data
+      await addMilkProduction(formattedData); // Use the API function to post data
   
       // If the request is successful, show a success message
       setSuccess(true);
   
       // Redirect after success
-      setTimeout(() => navigate('/milk-production-list'), 2000);
+      setTimeout(() => navigate('/milk-production'), 2000);
     } catch (err) {
       console.error('Error adding milk production:', err.message);
       setError("Failed to add milk production.");
@@ -122,7 +122,7 @@ const AddMilkProduction = () => {
           {/* Cow Dropdown */}
           <Grid item xs={12}>
             <FormControl fullWidth>
-              <InputLabel id="cow-id-label">Cattle ID</InputLabel>
+              <InputLabel id="cow-id-label">Cow ID</InputLabel>
               <Select
                 labelId="cow-id-label"
                 name="cowId"

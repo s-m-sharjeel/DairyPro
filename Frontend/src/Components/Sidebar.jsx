@@ -23,11 +23,36 @@ const Sidebar = () => {
         {isCollapsed ? '➡️' : '⬅️'}
       </button>
       <ul className="nav-list">
+
+        {/* Feed Management */}
+        <li>
+          <NavLink to="/feed-inventory" className="nav-item" activeClassName="active" onClick={collapseSidebar}>
+            <FaSeedling className="icon" />
+            {!isCollapsed && <span>Feed Management</span>}
+          </NavLink>
+        </li>
+
+        {/* Cattle Management */}
+        <li>
+          <NavLink to="/cattle-list" className="nav-item" activeClassName="active" onClick={collapseSidebar}>
+            <FaChartLine className="icon" />
+            {!isCollapsed && <span>Cattle Management</span>}
+          </NavLink>
+        </li>
+
         {/* Milk Production */}
         <li>
           <NavLink to="/milk-production" className="nav-item" activeClassName="active" onClick={collapseSidebar}>
-            <FaSeedling className="icon" />
+            <FaClipboard className="icon" />
             {!isCollapsed && <span>Milk Production</span>}
+          </NavLink>
+        </li>
+
+        {/* Breeding Management */}
+        <li>
+          <NavLink to="/breeding-records" className="nav-item" activeClassName="active" onClick={collapseSidebar}>
+            <FaDatabase className="icon" />
+            {!isCollapsed && <span>Breeding Management</span>}
           </NavLink>
         </li>
 
@@ -39,29 +64,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Feed Management */}
-        <li>
-          <NavLink to="/feed-inventory" className="nav-item" activeClassName="active" onClick={collapseSidebar}>
-            <FaClipboard className="icon" />
-            {!isCollapsed && <span>Feed Management</span>}
-          </NavLink>
-        </li>
-
-        {/* Breeding Management */}
-        <li>
-          <NavLink to="/add-breeding-record" className="nav-item" activeClassName="active" onClick={collapseSidebar}>
-            <FaDatabase className="icon" />
-            {!isCollapsed && <span>Breeding Management</span>}
-          </NavLink>
-        </li>
-
-        {/* Cattle Management */}
-        <li>
-          <NavLink to="/cattle-list" className="nav-item" activeClassName="active" onClick={collapseSidebar}>
-            <FaChartLine className="icon" />
-            {!isCollapsed && <span>Cattle Management</span>}
-          </NavLink>
-        </li>
       </ul>
     </div>
   );

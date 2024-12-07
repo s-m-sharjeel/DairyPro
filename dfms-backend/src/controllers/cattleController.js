@@ -44,14 +44,13 @@ async function updateCattle(req, res) {
   
   const { cattleID } = req.params; // Get cattleID from the URL parameters
   const updatedData = req.body; // Get data from request body
-  console.log(cattleID);
   // Validate that cattleID is present in the URL parameters
   if (!cattleID) {
     return res.status(400).send({ message: 'CattleID is required' });
   }
 
   // Check if all necessary fields are provided in the body
-  if (!updatedData.type || !updatedData.breed || !updatedData.age || !updatedData.weight || !updatedData.feed || !updatedData.feedConsumption) {
+  if (!updatedData.breed || !updatedData.age || !updatedData.weight || !updatedData.feed || !updatedData.feedConsumption) {
     return res.status(400).send({ message: 'All fields are required' });
   }
 

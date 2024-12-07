@@ -30,7 +30,7 @@ async function getAllFeeds() {
   let connection;
   try {
     connection = await getConnection();
-    const result = await connection.execute('SELECT * FROM Feed');
+    const result = await connection.execute('SELECT * FROM Feed ORDER BY FeedID');
     return result.rows.map(row => ({
       feedID: row[0],
       type: row[1],

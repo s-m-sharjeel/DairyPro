@@ -15,7 +15,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton
 } from "@mui/material";
+
+import { Link } from 'react-router-dom';
+import DeleteIcon from "@mui/icons-material/Delete";  // For delete icon
+import EditIcon from "@mui/icons-material/Edit";  // For edit icon
 
 const MilkProductionList = () => {
   const [milkProductionData, setMilkProductionData] = useState([]);
@@ -95,12 +100,12 @@ const MilkProductionList = () => {
   };
 
   // Get quality color
-  const getQualityColor = (quality) => {
-    if (quality >= 0 && quality <= 3) return "#FF6666";
-    if (quality >= 4 && quality <= 8) return "#FFFACD";
-    if (quality >= 9 && quality <= 10) return "#B2FF66";
-    return "transparent";
-  };
+  // const getQualityColor = (quality) => {
+  //   if (quality >= 0 && quality <= 3.33) return "#FF6666";
+  //   if (quality >= 3.33 && quality <= 6.66) return "#FFFACD";
+  //   if (quality >= 6.66 && quality <= 10) return "#B2FF66";
+  //   return "transparent";
+  // };
 
   return (
     <div style={{ padding: "20px" }}>
@@ -124,12 +129,16 @@ const MilkProductionList = () => {
         <Button variant="outlined" color="secondary" onClick={fetchMilkProductionData}>
           Reset
         </Button>
+        <Button component={Link} to="/add-milk-production" variant="contained" color="primary">
+          Add
+        </Button>
       </div>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
+              {/* <TableCell align="center">MP ID</TableCell> */}
               <TableCell align="center">Cow ID</TableCell>
               <TableCell align="center">Date</TableCell>
               <TableCell align="center">Time</TableCell>
@@ -148,37 +157,36 @@ const MilkProductionList = () => {
             ) : milkProductionData.length > 0 ? (
               milkProductionData.map((record) => (
                 <TableRow key={record.mpId}>
+                  {/* <TableCell align="center">{record.mpId}</TableCell> */}
                   <TableCell align="center">{record.cowId}</TableCell>
                   <TableCell align="center">{record.date}</TableCell>
                   <TableCell align="center">{record.time}</TableCell>
                   <TableCell align="center">{record.quantity}</TableCell>
                   <TableCell
                     align="center"
-                    style={{
-                      backgroundColor: getQualityColor(record.qualityTestResult),
-                      color: "white",
-                    }}
+                    // style={{
+                    //   color: getQualityColor(record.qualityTestResult)
+                    // }}
                   >
                     {record.qualityTestResult}
                   </TableCell>
                   <TableCell align="center">
-                    <Button
-                      variant="outlined"
+                    {/* Edit Button */}
+                    <IconButton
                       color="primary"
-                      size="small"
                       onClick={() => handleEdit(record)}
-                      style={{ marginRight: "5px" }}
                     >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outlined"
+                      <EditIcon />
+                    </IconButton>
+                    {/* Delete Button */}
+                    <IconButton
                       color="secondary"
-                      size="small"
-                      onClick={() => handleDelete(record.mpId)}
+                      onClick={() => {
+                        handleDelete(record.mpId)
+                      }}
                     >
-                      Delete
-                    </Button>
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
