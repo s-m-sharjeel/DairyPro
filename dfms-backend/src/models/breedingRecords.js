@@ -3,11 +3,13 @@ const { getConnection } = require('../db');  // Assuming you have a db connectio
 // Add Breeding Record
 async function addBreedingRecord({ cowID, bullID, offspringID, date }) {
     let connection;
+    console.log("date: ", date);
     try {
       connection = await getConnection();
+      const formattedDate = new Date(date).toISOString().split('T')[0]; // Format as YYYY-MM-DD
       const result = await connection.execute(
-        `BEGIN AddBreedingRecord(:cowID, :bullID, :offspringID, :date); END`,
-        [cowID, bullID, offspringID, date],
+        `BEGIN AddBreedingRecord(:cowID, :bullID, :offspringID, TO_DATE(:date, 'YYYY-MM-DD')); END;`,
+        [cowID, bullID, offspringID, formattedDate],
         { autoCommit: true }
       );
       return result;

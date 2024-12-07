@@ -47,6 +47,17 @@ export const addFeed = async (feedData) => {
   }
 };
 
+// Function to add a new BR
+export const addBR = async (BRData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/breedingRecords`, BRData); // Ensure the endpoint is correct
+    return response.data;
+  } catch (error) {
+    console.error("Error adding Breeding Record:", error);
+    throw error;
+  }
+};
+
 // Function to update an existing cattle
 export const updateCattle = async (cattleID, cattleData) => {
   try {
