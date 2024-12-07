@@ -4,10 +4,10 @@ import axios from "../../services/api";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
-    totalMilkProduced: 0,
+    totalMilk: 0,
     averageQuality: 0,
-    healthAlerts: 0,
-    feedInventoryStatus: 0,
+    topFeed: "N/A",
+    healthAlerts: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -15,25 +15,19 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         // Fetch all data concurrently
-        const [
-          totalMilkResponse,
-          averageQualityResponse,
-          healthAlertsResponse,
-          feedInventoryResponse,
-        ] = await Promise.all([
-          axios.get("http://localhost:3001/api/dashboard/totalMilk"),
-          axios.get("http://localhost:3001/api/dashboard/averageQuality"),
-          axios.get("http://localhost:3001/api/dashboard/healthAlerts"),
-          axios.get("http://localhost:3001/api/dashboard/feedInventoryStatus"),
-        ]);
+        const totalMilkResponse = await axios.get("http://localhost:3001/api/dashboard/totalMilk");
+        const averageQualityResponse = await axios.get("http://localhost:3001/api/dashboard/averageQuality");
+        const topFeedResponse = await axios.get("http://localhost:3001/api/dashboard/topFeed");
+        const healthAlertsResponse = await axios.get("http://localhost:3001/api/dashboard/healthAlerts");
 
         // Update the dashboard data with API responses
         setDashboardData({
-          totalMilkProduced: totalMilkResponse.data.totalMilkProduced || 0,
+          totalMilk: totalMilkResponse.data.totalMilk || 0, // Access the first object in the array
           averageQuality: averageQualityResponse.data.averageQuality || 0,
+          topFeed: topFeedResponse.data.topFeed || "N/A",
           healthAlerts: healthAlertsResponse.data.healthAlerts || 0,
-          feedInventoryStatus: feedInventoryResponse.data.feedInventoryStatus || 0,
         });
+        // console.log("Error fetching dashboard data:", dashboardData.totalMilk);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
@@ -42,6 +36,7 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
+    // console.log("totalMilk: ", dashboardData.totalMilk);
   }, []); // Empty dependency array ensures it runs only once on component mount
 
   if (loading) {
@@ -72,7 +67,7 @@ const Dashboard = () => {
               <Typography variant="h6" color="textSecondary" gutterBottom>
                 Total Milk Produced
               </Typography>
-              <Typography variant="h5">{dashboardData.totalMilkProduced}</Typography>
+              <Typography variant="h5">{dashboardData.totalMilk}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -92,9 +87,9 @@ const Dashboard = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary" gutterBottom>
-                Health Alerts
+                Top Feed
               </Typography>
-              <Typography variant="h5">{dashboardData.healthAlerts}</Typography>
+              <Typography variant="h5">{dashboardData.topFeed}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -103,9 +98,9 @@ const Dashboard = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary" gutterBottom>
-                Feed Inventory Status
+                Health Alerts
               </Typography>
-              <Typography variant="h5">{dashboardData.feedInventoryStatus}</Typography>
+              <Typography variant="h5">{dashboardData.healthAlerts}</Typography>
             </CardContent>
           </Card>
         </Grid>

@@ -21,8 +21,19 @@ async function getAverageQualityOfMilk(req, res) {
   }
 }
 
+async function getMostConsumedFeed(req, res) {
+  try {
+    const topConsumed = await dashboardModel.getMostConsumedFeedForToday();
+    res.json(topConsumed);
+  } catch (err) {
+    console.error('Error fetching top most consumed feed:', err);
+    res.status(500).send('Error fetching top most consumed feed');
+  }
+}
+
 // Export the functions to be used in the routes
 module.exports = {
   getTotalMilkProduced,
-  getAverageQualityOfMilk
+  getAverageQualityOfMilk,
+  getMostConsumedFeed
 };

@@ -116,7 +116,7 @@ const AddMilkProduction = () => {
 
   return (
     <div className="add-milk-production-container">
-      <Typography variant="h4">Add Milk Production</Typography>
+      <Typography variant="h4" gutterBottom>Add Milk Production</Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           {/* Cow Dropdown */}

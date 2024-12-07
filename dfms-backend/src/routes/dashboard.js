@@ -3,6 +3,7 @@ const router = express.Router();
 const dashboardController = require('../controllers/dashboardController');
 
 router.get('/totalMilk', dashboardController.getTotalMilkProduced);
-router.get('/avgQuality', dashboardController.getAverageQualityOfMilk);
+router.get('/averageQuality', dashboardController.getAverageQualityOfMilk);
+router.get('/topFeed', dashboardController.getMostConsumedFeed);
 
 module.exports = router;

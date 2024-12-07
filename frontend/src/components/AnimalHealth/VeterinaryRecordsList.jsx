@@ -14,15 +14,19 @@ import {
   Button,
   Dialog,
   DialogTitle,
+  IconButton,
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import { Link } from 'react-router-dom';
+import DeleteIcon from "@mui/icons-material/Delete";  // For delete icon
+import EditIcon from "@mui/icons-material/Edit";  // For edit icon
 import axios from "../../services/api";
 
 const VeterinaryRecordsList = () => {
   const [records, setRecords] = useState([]);
+  const [searchType, setSearchType] = useState("");
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [editRecord, setEditRecord] = useState(null); // For editing a record
 
   const [formData, setFormData] = useState({
@@ -111,13 +115,6 @@ const VeterinaryRecordsList = () => {
     }
   };
 
-  const filteredRecords = records.filter(
-    (record) =>
-      (record.cattleID && record.cattleID.toString().includes(searchQuery)) ||
-      (record.vetName && record.vetName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (record.date && record.date.includes(searchQuery))
-  );
-
   // Function to format date and time
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -127,6 +124,20 @@ const VeterinaryRecordsList = () => {
   const formatTime = (timeString) => {
     const time = new Date(timeString);
     return time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); // e.g., 7:00 PM
+  };
+
+  const filteredData = records.filter(
+    (record) =>
+      record.diagnosis.toLowerCase().includes(searchType.toLowerCase()) ||
+      record.symptoms.toLowerCase().includes(searchType.toLowerCase())
+  );
+
+  const handleSearch = () => {
+    if (!searchType) {
+      fetchRecords();
+      return;
+    }
+    setRecords(filteredData);
   };
 
   if (loading) {
@@ -145,65 +156,71 @@ const VeterinaryRecordsList = () => {
   }
 
   return (
-    <Box sx={{ padding: "20px" }}>
+      
+    <div style={{ padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
         Veterinary Records
       </Typography>
-      <TextField
-        label="Search"
-        variant="outlined"
-        fullWidth
-        sx={{ marginBottom: 3 }}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      {/* <Button
-        variant="contained"
-        color="primary"
-        sx={{ marginBottom: 3 }}
-        onClick={() => handleOpenDialog()}
-      >
-       
-      </Button> */}
+
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <TextField
+          label="Search by Disease or Symptoms"
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+          variant="outlined"
+          size="small"
+        />
+        <Button variant="contained" color="primary" onClick={handleSearch}>
+          Search
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={fetchRecords}>
+          Reset
+        </Button>
+        <Button component={Link} to="/add-veterinary-record" variant="contained" color="primary">
+          Add
+        </Button>
+      </div>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Cattle ID</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Time</TableCell>
-              <TableCell>Vet Name</TableCell>
-              <TableCell>Symptoms</TableCell>
-              <TableCell>Diagnosis</TableCell>
-              <TableCell>Treatment</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell align="center">Cattle ID</TableCell>
+              <TableCell align="center">Date</TableCell>
+              <TableCell align="center">Time</TableCell>
+              <TableCell align="center">Vet Name</TableCell>
+              <TableCell align="center">Symptoms</TableCell>
+              <TableCell align="center">Diagnosis</TableCell>
+              <TableCell align="center">Treatment</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRecords.map((record) => (
+            {filteredData.map((record) => (
               <TableRow key={record.vrid}>
-                <TableCell>{record.cattleID}</TableCell>
-                <TableCell>{formatDate(record.date)}</TableCell>
-                <TableCell>{formatTime(record.time)}</TableCell>
-                <TableCell>{record.vetName}</TableCell>
-                <TableCell>{record.symptoms}</TableCell>
-                <TableCell>{record.diagnosis}</TableCell>
-                <TableCell>{record.treatment}</TableCell>
-                <TableCell>
-                  <Button
+                <TableCell align="center">{record.cattleID}</TableCell>
+                <TableCell align="center">{formatDate(record.date)}</TableCell>
+                <TableCell align="center">{formatTime(record.time)}</TableCell>
+                <TableCell align="center">{record.vetName}</TableCell>
+                <TableCell align="center">{record.symptoms}</TableCell>
+                <TableCell align="center">{record.diagnosis}</TableCell>
+                <TableCell align="center">{record.treatment}</TableCell>
+                <TableCell align="center">
+                  {/* Edit Button */}
+                  <IconButton
                     variant="contained"
                     color="primary"
                     onClick={() => handleOpenDialog(record)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => deleteRecord(record.vrid)}
-                  >
-                    Delete
-                  </Button>
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    {/* Delete Button */}
+                    <IconButton
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => deleteRecord(record.vrid)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -213,7 +230,7 @@ const VeterinaryRecordsList = () => {
 
       {/* Dialog for Add/Edit */}
       <Dialog open={open} onClose={handleCloseDialog}>
-        <DialogTitle>{editRecord ? "Edit Record" : "Add Record"}</DialogTitle>
+        <DialogTitle>Edit Veterinary Record</DialogTitle>
         <DialogContent>
           <TextField
             label="Cattle ID"
@@ -224,7 +241,7 @@ const VeterinaryRecordsList = () => {
             fullWidth
             margin="normal"
           />
-          <TextField
+          {/* <TextField
             label="Date"
             type="date"
             value={formData.date}
@@ -245,7 +262,7 @@ const VeterinaryRecordsList = () => {
             fullWidth
             margin="normal"
             InputLabelProps={{ shrink: true }}
-          />
+          /> */}
           <TextField
             label="Vet Name"
             value={formData.vetName}
@@ -288,11 +305,11 @@ const VeterinaryRecordsList = () => {
             Cancel
           </Button>
           <Button onClick={handleSubmit} color="primary">
-            {editRecord ? "Save Changes" : "Add Record"}
+            Save Changes
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 };
 

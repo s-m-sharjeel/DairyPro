@@ -8,8 +8,7 @@ async function getMilkProductionForToday() {
         FROM MilkProduction
         WHERE TRUNC("Date") = TRUNC(SYSDATE)`);
     return result.rows.map(row => ({
-      totalMilk: row[0],
-      avgQuality: row[1]
+      totalMilk: row[0]
     }));
   } catch (err) {
     console.error('Error fetching cattle:', err);
@@ -25,13 +24,12 @@ async function getAverageQualityForToday() {
   let connection;
 try {
   connection = await getConnection();
-  const result = await connection.execute(`SELECT AVG(QualityTestResult)
+  await connection.execute(`SELECT AVG(QualityTestResult)
       FROM MilkProduction
       WHERE TRUNC("Date") = TRUNC(SYSDATE)`);
-  return result.rows.map(row => ({
-    totalMilk: row[0],
-    avgQuality: row[1]
-  }));
+  return () => ({
+    averageQuality: row[0][0]
+  });
 } catch (err) {
   console.error('Error fetching average quality for today:', err);
   throw err;
@@ -42,8 +40,32 @@ try {
 }
 }
 
+async function getMostConsumedFeedForToday() {
+  let connection;
+try {
+  connection = await getConnection();
+  const result = await connection.execute(`SELECT f.Type AS FeedType 
+    FROM Feed f 
+    JOIN Cattle c 
+    ON c.feedID = f.feedID 
+    GROUP BY (f.Type) 
+    ORDER BY SUM(c.feedConsumption) DESC 
+    FETCH FIRST ROW ONLY`);
+  return result.rows.map(row => ({
+    topFeed: row[0]
+  }));
+} catch (err) {
+  console.error('Error fetching Most Consumed Feed For Today:', err);
+  throw err;
+} finally {
+  if (connection) {
+    await connection.close();
+  }
+}
+}
 
 module.exports = {
     getMilkProductionForToday,
-    getAverageQualityForToday
+    getAverageQualityForToday,
+    getMostConsumedFeedForToday
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, FormControl, InputLabel } from '@mui/material';
+import { TextField, Button, FormControl, InputLabel, Grid, Select, MenuItem, Typography } from '@mui/material';
 import axios from '../../services/api'; // Axios instance configured for API calls
 import '../../index.css'; // Optional styling
 
@@ -71,14 +71,14 @@ const AddVeterinaryRecord = () => {
 
   return (
     <div className="add-veterinary-record">
-      <h2>Add Veterinary Record</h2>
+      <Typography variant="h4">Add Veterinary Record</Typography>
       <form onSubmit={handleSubmit}>
-        <FormControl fullWidth margin="normal">
+        {/* <FormControl fullWidth margin="normal">
           <InputLabel>Cattle</InputLabel>
           <select
             value={formData.CattleID}
             onChange={handleChange}
-            name="CattleID"
+            // name="CattleID"
             required
             style={{ width: '100%', padding: '10px', fontSize: '16px' }}
           >
@@ -89,7 +89,25 @@ const AddVeterinaryRecord = () => {
               </option>
             ))}
           </select>
-        </FormControl>
+        </FormControl> */}
+        {/* Cow Dropdown */}
+        <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel>Cattle ID</InputLabel>
+              <Select
+                name="CattleID"
+                value={formData.CattleID}
+                onChange={handleChange}
+                fullWidth
+              >
+                {cattleList.map((cattle, index) => (
+                  <MenuItem key={index} value={cattle.cattleID}> {/* Use cow.cattleID here */}
+                    {cattle.cattleID} {/* Display cattleID */}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
         <TextField
           label="Veterinarian Name"

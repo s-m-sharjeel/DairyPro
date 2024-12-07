@@ -1,5 +1,4 @@
 const { getConnection } = require('../db'); // Importing the database connection utility
-const oracledb = require("oracledb");
 
 async function addVeterinaryRecord(cattleID, date, time, symptoms, diagnosis, treatment, vetName) {
   let connection;
