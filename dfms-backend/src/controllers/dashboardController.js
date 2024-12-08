@@ -13,8 +13,8 @@ async function getTotalMilkProduced(req, res) {
 
 async function getAverageQualityOfMilk(req, res) {
   try {
-    const avgMilk = await dashboardModel.getAverageQualityForToday();
-    res.json(avgMilk);
+    const averageQuality = await dashboardModel.getAverageQualityForToday();
+    res.json(averageQuality);
   } catch (err) {
     console.error('Error fetching avg quality of milk:', err);
     res.status(500).send('Error fetching avg quality of milk');
@@ -31,9 +31,20 @@ async function getMostConsumedFeed(req, res) {
   }
 }
 
+async function getMostCommonHealthThreat(req, res) {
+  try {
+    const heathThreat = await dashboardModel.getBiggestHealthThreat();
+    res.json(heathThreat);
+  } catch (err) {
+    console.error('Error fetching top most consumed feed:', err);
+    res.status(500).send('Error fetching top most consumed feed');
+  }
+}
+
 // Export the functions to be used in the routes
 module.exports = {
   getTotalMilkProduced,
   getAverageQualityOfMilk,
-  getMostConsumedFeed
+  getMostConsumedFeed,
+  getMostCommonHealthThreat
 };

@@ -7,7 +7,7 @@ const Dashboard = () => {
     totalMilk: 0,
     averageQuality: 0,
     topFeed: "N/A",
-    healthAlerts: 0
+    healthThreat: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -18,14 +18,14 @@ const Dashboard = () => {
         const totalMilkResponse = await axios.get("http://localhost:3001/api/dashboard/totalMilk");
         const averageQualityResponse = await axios.get("http://localhost:3001/api/dashboard/averageQuality");
         const topFeedResponse = await axios.get("http://localhost:3001/api/dashboard/topFeed");
-        const healthAlertsResponse = await axios.get("http://localhost:3001/api/dashboard/healthAlerts");
+        const healthThreatResponse = await axios.get("http://localhost:3001/api/dashboard/healthThreat");
 
         // Update the dashboard data with API responses
         setDashboardData({
-          totalMilk: totalMilkResponse.data.totalMilk || 0, // Access the first object in the array
-          averageQuality: averageQualityResponse.data.averageQuality || 0,
-          topFeed: topFeedResponse.data.topFeed || "N/A",
-          healthAlerts: healthAlertsResponse.data.healthAlerts || 0,
+          totalMilk: totalMilkResponse.data[0].totalMilk || 0, // Access the first object in the array
+          averageQuality: averageQualityResponse.data[0].averageQuality || 0,
+          topFeed: topFeedResponse.data[0].topFeed || "N/A",
+          healthThreat: healthThreatResponse.data[0].healthThreat || 0,
         });
         // console.log("Error fetching dashboard data:", dashboardData.totalMilk);
       } catch (error) {
@@ -98,9 +98,9 @@ const Dashboard = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" color="textSecondary" gutterBottom>
-                Health Alerts
+                Health Threat
               </Typography>
-              <Typography variant="h5">{dashboardData.healthAlerts}</Typography>
+              <Typography variant="h5">{dashboardData.healthThreat}</Typography>
             </CardContent>
           </Card>
         </Grid>
