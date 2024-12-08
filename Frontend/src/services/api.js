@@ -155,17 +155,17 @@ export const getAllCows = async () => {
   }
 };
 
-export const updatePassword = async ({ currentPassword, newPassword }, farmerID) => {
+export const updatePassword = async ({ currentPassword, newPassword }, userID) => {
   //const farmerID = localStorage.getItem("farmerID");
-  console.log('eche: ', farmerID);  // Ensure farmerID is logged correctly
+  console.log('eche: ', userID);  // Ensure farmerID is logged correctly
   //console.log(localStorage.getItem("farmerID"));
 
-  if (!farmerID) {
-    throw new Error("Farmer ID is missing.");
+  if (!userID) {
+    throw new Error("User ID is missing.");
   }
 
   try {
-    const response = await axios.put(`http://localhost:3001/api/farmer/${farmerID}/password`, {
+    const response = await axios.put(`http://localhost:3001/api/user/${userID}/password`, {
       currentPassword,
       newPassword,
     });
@@ -177,9 +177,9 @@ export const updatePassword = async ({ currentPassword, newPassword }, farmerID)
 };
 
 // Add this function in the api.js file
-export const updateUserSettings = async (formData, farmerID) => {
-  console.log(farmerID);
-  const response = await axios.put(`${BASE_URL}/api/farmer/${farmerID}`, formData);
+export const updateUserSettings = async (formData, userID) => {
+  console.log(userID);
+  const response = await axios.put(`${BASE_URL}/api/user/${userID}`, formData);
   return response.data;
 };
 

@@ -34,9 +34,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       console.log('Sending credentials:', credentials); // Log credentials for debugging
-      const { data } = await axios.post('http://localhost:3001/api/farmer/login', credentials);
+      const { data } = await axios.post('http://localhost:3001/api/user/login', credentials);
       if (data.success) {
-        const newUser = { isAuthenticated: true, ...data.farmer };
+        const newUser = { isAuthenticated: true, ...data.user };
         setUser(newUser);
         localStorage.setItem('user', JSON.stringify(newUser));
         resetSessionTimer();
@@ -49,11 +49,11 @@ export const AuthProvider = ({ children }) => {
   };
   
 
-  const register = async (name, contactInfo, password, role) => {
+  const register = async (name, email, password, role) => {
     try {
-      const response = await axios.post('http://localhost:3001/api/farmer/register', {
+      const response = await axios.post('http://localhost:3001/api/user/register', {
         name,
-        contactInfo,  // Make sure to send contactInfo instead of email
+        email,  // Make sure to send contactInfo as email
         password,
         role
       });

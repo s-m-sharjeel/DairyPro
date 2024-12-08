@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
-    contactInfo: "",
+    email: "",
     password: "",
     role: "",
   });
@@ -25,16 +25,17 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
   
-    if (!formData.name || !formData.contactInfo || !formData.password || !formData.role) {
-      alert("Please fill in all the fields.");
+    if (!formData.name || !formData.email || !formData.password || !formData.role) {
+      alert("Please fill in all the fields");
       setLoading(false);
       return;
     }
   
     try {
-      const response = await register(formData.name, formData.contactInfo, formData.password, formData.role);
+      
+      const response = await register(formData.name, formData.email, formData.password, formData.role);
       console.log(response); // Log the response to check what is returned
-      if (response?.message === "Farmer added successfully") {
+      if (response?.message === "User added successfully") {
         alert("Registration Successful. You can now log in.");
         navigate("/login");
       } else {
@@ -42,7 +43,7 @@ const Register = () => {
         navigate("/login");
       }
     } catch (error) {
-      alert("Error. Something went wrong. Please try again later. User already exists");
+      alert("Error. Something went wrong. Please try again later.", error);
       console.error(error);  // Log error for debugging
     } finally {
       setLoading(false);
@@ -68,11 +69,11 @@ const Register = () => {
           </div>
 
           <div style={{ marginBottom: "15px" }}>
-            <label htmlFor="contactInfo">Contact Info</label>
+            <label htmlFor="contactInfo">Email</label>
             <input
               type="text"  // Use text or email depending on your preference
-              name="contactInfo"
-              value={formData.contactInfo}
+              name="email"
+              value={formData.email}
               onChange={handleInputChange}
               required
               style={{ width: "100%", padding: "8px", marginTop: "5px", borderRadius: "4px", border: "1px solid #ddd" }}
@@ -95,14 +96,16 @@ const Register = () => {
             <label htmlFor="role">Role</label>
             <select
               name="role"
+              type="string"
               value={formData.role}
               onChange={handleInputChange}
               required
               style={{ width: "100%", padding: "8px", marginTop: "5px", borderRadius: "4px", border: "1px solid #ddd" }}
             >
               <option value="">Select role</option>
-              <option value="farmer">Farmer</option>
-              <option value="admin">Admin</option>
+              <option value="Farmer">Farmer</option>
+              <option value="Vet">Vet</option>
+              <option value="Admin">Admin</option>
             </select>
           </div>
 

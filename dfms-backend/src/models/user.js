@@ -1,112 +1,112 @@
 const bcrypt = require('bcryptjs');
 const { getConnection } = require('../db');
 
-async function addFarmer({ name, contactInfo, role, password }) {
+async function addUser({ name, email, role, password }) {
   let connection;
   try {
-    if (!name || !contactInfo || !role || !password) {
+    if (!name || !email || !role || !password) {
       throw new Error('All fields are required');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     connection = await getConnection();
 
-    const existingFarmer = await connection.execute(
-      'SELECT * FROM Farmer WHERE ContactInfo = :contactInfo',
-      [contactInfo]
+    const existingUser = await connection.execute(
+      'SELECT * FROM "User" WHERE email = :email',
+      [email]
     );
 
-    if (existingFarmer.rows.length > 0) {
-      throw new Error('Contact information already in use');
+    if (existingUser.rows.length > 0) {
+      throw new Error('email already in use');
     }
 
     await connection.execute(
-      `BEGIN AddFarmer(:name, :contactInfo, :role, :password); END;`,
-      { name, contactInfo, role, password: hashedPassword },
+      `BEGIN AddUser(:name, :email, :password, :role); END;`,
+      { name, email, role, password: hashedPassword },
       { autoCommit: true }
     );
 
     return { success: true };
   } catch (err) {
-    console.error('Error adding farmer:', err);
-    throw new Error(err.message || 'Error adding farmer');
+    console.error('Error adding User:', err);
+    throw new Error(err.message || 'Error adding User');
   } finally {
     if (connection) await connection.close();
   }
 }
 
-async function getAllFarmers() {
+async function getAllUsers() {
   let connection;
   try {
     connection = await getConnection();
-    const result = await connection.execute('SELECT * FROM Farmer');
+    const result = await connection.execute('SELECT * FROM "User"');
     return result.rows.map(row => ({
-      farmerID: row[0],
+      UserID: row[0],
       name: row[1],
-      contactInfo: row[2],
+      email: row[2],
       role: row[3],
     }));
   } catch (err) {
-    console.error('Error fetching farmers:', err);
+    console.error('Error fetching Users:', err);
     throw err;
   } finally {
     if (connection) await connection.close();
   }
 }
 
-async function updateFarmer(farmerID, { name, contactInfo, role, password }) {
+async function updateUser(UserID, { name, email, role, password }) {
   let connection;
   try {
     connection = await getConnection();
 
     const query = `
-      UPDATE Farmer 
+      UPDATE "User" 
       SET Name = :name, 
-          ContactInfo = :contactInfo, 
+          email = :email, 
           Role = :role 
           ${password ? ', Password = :password' : ''} 
-      WHERE FarmerID = :farmerID
+      WHERE UserID = :UserID
     `;
 
-    const params = { name, contactInfo, role, farmerID };
+    const params = { name, email, role, UserID };
     if (password) params.password = await bcrypt.hash(password, 10);
 
     await connection.execute(query, params, { autoCommit: true });
   } catch (err) {
-    console.error('Error updating farmer:', err);
+    console.error('Error updating User:', err);
     throw err;
   } finally {
     if (connection) await connection.close();
   }
 }
 
-async function deleteFarmer(farmerID) {
+async function deleteUser(UserID) {
   let connection;
   try {
     connection = await getConnection();
     await connection.execute(
-      `DELETE FROM Farmer WHERE FarmerID = :farmerID`,
-      [farmerID],
+      `BEGIN DeleteUser(:UserID); END;`,
+      [UserID],
       { autoCommit: true }
     );
   } catch (err) {
-    console.error('Error deleting farmer:', err);
+    console.error('Error deleting User:', err);
     throw err;
   } finally {
     if (connection) await connection.close();
   }
 }
 
-async function checkFarmerLogin(contactInfo, password) {
+async function checkUserLogin(email, password) {
   let connection;
   try {
     connection = await getConnection();
     const query = `
-      SELECT FarmerID, Name, ContactInfo, Role, Password
-      FROM Farmer 
-      WHERE ContactInfo = :contactInfo
+      SELECT UserID, Name, Email, Role, Password
+      FROM "User" 
+      WHERE email = :email
     `;
-    const result = await connection.execute(query, { contactInfo });
+    const result = await connection.execute(query, { email });
 
     if (result.rows.length === 0) return null;
 
@@ -114,26 +114,26 @@ async function checkFarmerLogin(contactInfo, password) {
     const isPasswordValid = await bcrypt.compare(password, row[4]);
     if (!isPasswordValid) return null;
 
-    return { farmerID: row[0], name: row[1], contactInfo: row[2], role: row[3] };
+    return { userID: row[0], name: row[1], email: row[2], role: row[3] };
   } catch (err) {
-    console.error('Error checking farmer login:', err);
+    console.error('Error checking User login:', err);
     throw err;
   } finally {
     if (connection) await connection.close();
   }
 }
 
-async function updateFarmerPassword(farmerID, currentPassword, newPassword) {
+async function updateUserPassword(UserID, currentPassword, newPassword) {
   let connection;
   try {
     connection = await getConnection();
     const result = await connection.execute(
-      'SELECT Password FROM Farmer WHERE FarmerID = :farmerID',
-      { farmerID }
+      'SELECT Password FROM "User" WHERE UserID = :UserID',
+      { UserID }
     );
 
     if (result.rows.length === 0) {
-      throw new Error('Farmer not found');
+      throw new Error('User not found');
     }
 
     const storedPassword = result.rows[0][0];
@@ -143,8 +143,8 @@ async function updateFarmerPassword(farmerID, currentPassword, newPassword) {
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
     await connection.execute(
-      'UPDATE Farmer SET Password = :newPassword WHERE FarmerID = :farmerID',
-      { newPassword: hashedNewPassword, farmerID },
+      'BEGIN UpdatePassword(:UserID, :newPassword); END;',
+      { newPassword: hashedNewPassword, UserID },
       { autoCommit: true }
     );
 
@@ -157,15 +157,15 @@ async function updateFarmerPassword(farmerID, currentPassword, newPassword) {
   }
 }
 
-async function updateFarmerSettings(farmerID, settings) {
+async function updateUserSettings(UserID, settings) {
   let connection;
   try {
     connection = await getConnection();
     await connection.execute(
-      `UPDATE FarmerSettings 
+      `UPDATE UserSettings 
       SET Settings = :settings 
-      WHERE FarmerID = :farmerID`,
-      { settings: JSON.stringify(settings), farmerID },
+      WHERE UserID = :UserID`,
+      { settings: JSON.stringify(settings), UserID },
       { autoCommit: true }
     );
   } catch (err) {
@@ -178,11 +178,11 @@ async function updateFarmerSettings(farmerID, settings) {
 
 
 module.exports = {
-  addFarmer,
-  getAllFarmers,
-  updateFarmer,
-  deleteFarmer,
-  checkFarmerLogin,
-  updateFarmerPassword,
-  updateFarmerSettings
+  addUser,
+  getAllUsers,
+  updateUser,
+  deleteUser,
+  checkUserLogin,
+  updateUserPassword,
+  updateUserSettings
 };

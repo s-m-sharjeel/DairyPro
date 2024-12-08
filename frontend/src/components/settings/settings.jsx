@@ -7,9 +7,9 @@ import { updatePassword } from "../../services/api"; // API call for password up
 const Settings = () => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
-    farmerID: user?.farmerID || "", // Assuming user contains the farmerID
+    userID: user?.userID || "", // Assuming user contains the userID
     name: user?.name || "",
-    contactInfo: user?.contactInfo || "",
+    email: user?.email || "",
     role: user?.role || "",
   });
   
@@ -32,13 +32,13 @@ const Settings = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log(formData.farmerID);
-    const farmerID = formData.farmerID;
+    console.log(formData.userID);
+    const userID = formData.userID;
     e.preventDefault();
     setError("");
     setSuccessMessage("");
     try {
-      await updateUserSettings(formData, farmerID);
+      await updateUserSettings(formData, userID);
       setSuccessMessage("Settings updated successfully!");
     } catch (error) {
       setError("Failed to update settings. Please try again.");
@@ -46,7 +46,7 @@ const Settings = () => {
   };
   
   const handlePasswordUpdate = async (e) => {
-    console.log(formData.farmerID);
+    console.log(formData.userID);
     e.preventDefault();
     setError("");
     setSuccessMessage("");
@@ -55,7 +55,7 @@ const Settings = () => {
       return;
     }
     try {
-      await updatePassword(passwordData, formData.farmerID);
+      await updatePassword(passwordData, formData.userID);
       setSuccessMessage("Password updated successfully!");
       setPasswordData({ currentPassword: "", newPassword: "", confirmNewPassword: "" });
     } catch (error) {
@@ -82,9 +82,9 @@ const Settings = () => {
           margin="normal"
         />
         <TextField
-          label="Contact Info"
-          name="contactInfo"
-          value={formData.contactInfo}
+          label="email Info"
+          name="email"
+          value={formData.email}
           onChange={handleChange}
           fullWidth
           margin="normal"
@@ -117,14 +117,14 @@ const Settings = () => {
           margin="normal"
         />
        <TextField
-  label="New Password"
-  name="newPassword"
-  type="password"
-  value={passwordData.newPassword}
-  onChange={handleChange}
-  fullWidth
-  margin="normal"
-/>
+          label="New Password"
+          name="newPassword"
+          type="password"
+          value={passwordData.newPassword}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
 
         <TextField
           label="Confirm New Password"

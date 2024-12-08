@@ -41,7 +41,7 @@ const Login = () => {
   
     try {
       const credentials = {
-        contactInfo: formData.email, // Change 'email' to 'contactInfo' to match backend
+        email: formData.email,
         password: formData.password,
       };
       await login(credentials); // Call login from AuthContext
