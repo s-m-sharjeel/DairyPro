@@ -8,6 +8,10 @@ async function addUser({ name, email, role, password }) {
       throw new Error('All fields are required');
     }
 
+    // console.log(name);
+    // console.log(email);
+    // console.log(role);
+    // console.log(password);
     const hashedPassword = await bcrypt.hash(password, 10);
     connection = await getConnection();
 
@@ -21,7 +25,7 @@ async function addUser({ name, email, role, password }) {
     }
 
     await connection.execute(
-      `BEGIN AddUser(:name, :email, :password, :role); END;`,
+      `BEGIN AddUser(:name, :email, :role, :password); END;`,
       { name, email, role, password: hashedPassword },
       { autoCommit: true }
     );

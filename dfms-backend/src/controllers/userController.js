@@ -4,7 +4,12 @@ async function addUser(req, res) {
   const { name, email, role, password } = req.body;
 
   try {
+    // console.log(name);
+    // console.log(email);
+    // console.log(role);
+    // console.log(password);
     await UserModel.addUser({ name, email, role, password });
+    
     res.status(201).send('User added successfully');
   } catch (err) {
     res.status(500).send(err.message || 'Error adding User');

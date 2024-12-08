@@ -82,7 +82,8 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
-        {/* Health Alerts */}
+        
+        {/* Top Feed */}
         <Grid item xs={12} md={6} lg={3}>
           <Card>
             <CardContent>
@@ -93,7 +94,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
-        {/* Feed Inventory Status */}
+        {/* Health Threat */}
         <Grid item xs={12} md={6} lg={3}>
           <Card>
             <CardContent>
